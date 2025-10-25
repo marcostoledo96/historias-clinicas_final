@@ -55,6 +55,18 @@ const pool = new Pool({
   ssl: sslConfig,
 });
 
+// * Manejar errores del Pool en clientes inactivos (evita que el proceso se caiga)
+//   Casos típicos: reinicio del servidor, pooler cerrando conexiones, timeouts, mantenimiento.
+pool.on('error', (err) => {
+  try {
+    const msg = err && err.message ? err.message : String(err);
+    const code = err && err.code ? ` (code: ${err.code})` : '';
+    console.error(`⚠️  Error del Pool/cliente inactivo${code}:`, msg);
+  } catch (_) {
+    console.error('⚠️  Error del Pool/cliente inactivo');
+  }
+});
+
 // ? Probar la conexión al iniciar (log no bloqueante)
 pool
   .connect()
@@ -71,8 +83,7 @@ pool
         user: baseConfig.user ? baseConfig.user.replace(/.*/,'***') : undefined, // no exponer
         ssl: sslConfig ? { require: sslConfig.require, rejectUnauthorized: sslConfig.rejectUnauthorized } : false,
       };
-      console.error('❌ Error conectando a PostgreSQL:', err.message, '\
-\nDetalles:', safe);
+      console.error('❌ Error conectando a PostgreSQL:', err.message, '\nDetalles:', safe);
     } catch (_) {
       console.error('❌ Error conectando a PostgreSQL:', err.message);
     }

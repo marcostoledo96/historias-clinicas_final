@@ -29,6 +29,54 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (el) el.value = coberturaPref;
   }
 
+  // Mostrar edad al lado de la fecha de nacimiento (igual que en perfil)
+  const form = document.getElementById('form-crear-paciente');
+  const campoFecha = form ? form.querySelector('input[name="fecha_nacimiento"]') : null;
+  const spanEdad = document.getElementById('edad-texto');
+  const actualizarEdadCrear = () => {
+    if (!campoFecha || !spanEdad) return;
+    const fecha = campoFecha.value;
+    if (!fecha) { spanEdad.textContent = ''; return; }
+    const edad = calcularEdad(fecha);
+    if (edad === '' || isNaN(edad) || edad < 0) { spanEdad.textContent = ''; return; }
+    spanEdad.textContent = `${edad} años`;
+  };
+  if (campoFecha) {
+    ['change', 'input'].forEach(ev => campoFecha.addEventListener(ev, actualizarEdadCrear));
+    // Inicial
+    actualizarEdadCrear();
+  }
+
+  // Auto-grow para textareas (igual comportamiento que en perfil)
+  function inicializarAutoGrowTextareasCrear() {
+    try {
+      const areas = (form || document).querySelectorAll('#form-crear-paciente textarea');
+      areas.forEach((area) => {
+        const autoGrow = () => {
+          area.style.height = 'auto';
+          area.style.overflowY = 'hidden';
+          const cs = window.getComputedStyle(area);
+          let lineHeight = parseFloat(cs.lineHeight);
+          if (isNaN(lineHeight)) {
+            const fontSize = parseFloat(cs.fontSize) || 16;
+            lineHeight = Math.round(fontSize * 1.4);
+          }
+          const minRowsAttr = parseInt(area.getAttribute('rows') || '2', 10);
+          const minRows = Number.isFinite(minRowsAttr) && minRowsAttr > 0 ? minRowsAttr : 2;
+          const minHeight = Math.max(1, lineHeight * minRows);
+          const needed = area.scrollHeight;
+          area.style.height = Math.max(minHeight, needed) + 'px';
+        };
+        // Inicializar y bindear eventos
+        requestAnimationFrame(autoGrow);
+        area.addEventListener('input', autoGrow);
+        area.addEventListener('change', autoGrow);
+        area.addEventListener('paste', () => setTimeout(autoGrow, 0));
+      });
+    } catch {}
+  }
+  inicializarAutoGrowTextareasCrear();
+
   document.getElementById('btn-cancelar-crear').addEventListener('click', () => {
     if (returnTo === 'turnos') window.location.href = 'turnos.html';
     else window.history.length > 1 ? window.history.back() : window.location.href = 'inicio.html';
