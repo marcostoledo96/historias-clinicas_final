@@ -47,13 +47,13 @@ async function cargarPacientes(termino = '') {
 
 // * configurarEventosPacientes(): conecta búsqueda con debounce, alta y validaciones
 function configurarEventosPacientes() {
-  const entrada = document.getElementById('busqueda');
+  const input = document.getElementById('busqueda');
   document.getElementById('btn-buscar').addEventListener('click', () => {
-    const termino = entrada.value.trim();
+    const termino = input.value.trim();
     cargarPacientes(termino);
   });
-  entrada.addEventListener('entrada', debounce(() => {
-    const termino = entrada.value.trim();
+  input.addEventListener('input', debounce(() => {
+    const termino = input.value.trim();
     cargarPacientes(termino);
   }, 300));
 
@@ -64,19 +64,19 @@ function configurarEventosPacientes() {
 
   document.getElementById('btn-cancelar-nuevo').addEventListener('click', () => {
     document.getElementById('card-nuevo').classList.add('hidden');
-    limpiarFormulario('formulario-nuevo-paciente');
+    limpiarFormulario('form-nuevo-paciente');
   });
 
-  document.getElementById('formulario-nuevo-paciente').addEventListener('submit', async (e) => {
+  document.getElementById('form-nuevo-paciente').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const datos = Object.fromEntries(new FormData(e.target).entries());
+    const data = Object.fromEntries(new FormData(e.target).entries());
     
     // Validaciones mínimas
-    if (!validarDNI(datos.dni)) {
+    if (!validarDNI(data.dni)) {
       mostrarAlerta('DNI inválido', 'error');
       return;
     }
-    if (datos.email && !validarEmail(datos.email)) {
+    if (data.email && !validarEmail(data.email)) {
       mostrarAlerta('Email inválido', 'error');
       return;
     }
@@ -86,13 +86,13 @@ function configurarEventosPacientes() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(datos)
+        body: JSON.stringify(data)
       });
       const result = await resp.json();
       if (resp.ok) {
         mostrarAlerta('Paciente creado con éxito', 'success');
         document.getElementById('card-nuevo').classList.add('hidden');
-        limpiarFormulario('formulario-nuevo-paciente');
+        limpiarFormulario('form-nuevo-paciente');
         await cargarPacientes();
         if (result.id_paciente) cargarDetallePaciente(result.id_paciente);
       } else {
@@ -121,8 +121,8 @@ function renderPaginaPacientes() {
       <td>${p.cobertura || '-'}</td>
       <td>
         <div class="flex gap-4">
-          <boton class="btn btn-sm btn-primary" onclick="abrirPerfilPaciente(${p.id_paciente})">Ver</boton>
-          <boton class="btn btn-sm btn-error" onclick="eliminarPaciente(${p.id_paciente})">Eliminar</boton>
+          <button class="btn btn-sm btn-primary" onclick="abrirPerfilPaciente(${p.id_paciente})">Ver</button>
+          <button class="btn btn-sm btn-error" onclick="eliminarPaciente(${p.id_paciente})">Eliminar</button>
         </div>
       </td>
     </tr>
@@ -148,7 +148,7 @@ function renderPaginacion() {
   const cont = document.getElementById('paginacion');
   if (!cont) return;
 
-  const btn = (label, disabled, onClick) => `<boton class="btn btn-sm ${disabled ? 'boton-secundario' : ''}" ${disabled ? 'disabled' : ''} onclick="${onClick}">${label}</boton>`;
+  const btn = (label, disabled, onClick) => `<button class="btn btn-sm ${disabled ? 'btn-secondary' : ''}" ${disabled ? 'disabled' : ''} onclick="${onClick}">${label}</button>`;
 
   const items = [];
   items.push(btn('« Anterior', pagina === 1, `cambiarPagina(${pagina - 1})`));
@@ -157,7 +157,7 @@ function renderPaginacion() {
   let end = Math.min(totalPaginas, start + maxNums - 1);
   if (end - start < maxNums - 1) start = Math.max(1, end - maxNums + 1);
   for (let i = start; i <= end; i++) {
-    items.push(`<boton class="btn btn-sm ${i === pagina ? 'boton-primario' : ''}" onclick="cambiarPagina(${i})">${i}</boton>`);
+    items.push(`<button class="btn btn-sm ${i === pagina ? 'btn-primary' : ''}" onclick="cambiarPagina(${i})">${i}</button>`);
   }
   items.push(btn('Siguiente »', pagina === totalPaginas, `cambiarPagina(${pagina + 1})`));
 
@@ -182,7 +182,7 @@ async function cargarDetallePaciente(id) {
     const card = document.getElementById('card-detalle');
     card.classList.remove('hidden');
     document.getElementById('detalle-paciente').innerHTML = `
-      <div class="formulario-fila">
+      <div class="form-row">
         <div>
           <p><strong>${p.nombre} ${p.apellido}</strong></p>
           <p>DNI: ${p.dni}</p>
@@ -212,42 +212,42 @@ async function editarPaciente(id) {
   }
 }
 
-// * prepararEdicionPaciente(paciente, abrir): setea valores en formulario y registra submit
+// * prepararEdicionPaciente(paciente, abrir): setea valores en form y registra submit
 function prepararEdicionPaciente(paciente, abrir = false) {
   const card = document.getElementById('card-editar');
-  const formulario = document.getElementById('formulario-editar-paciente');
-  if (!formulario) return;
+  const form = document.getElementById('form-editar-paciente');
+  if (!form) return;
 
   // Setear dataset con id
-  formulario.dataset.id = paciente.id_paciente;
+  form.dataset.id = paciente.id_paciente;
 
   // Setear valores
-  formulario.nombre.value = paciente.nombre || '';
-  formulario.apellido.value = paciente.apellido || '';
-  formulario.dni.value = paciente.dni || '';
-  formulario.fecha_nacimiento.value = paciente.fecha_nacimiento ? paciente.fecha_nacimiento.substring(0,10) : '';
-  formulario.sexo.value = paciente.sexo || 'otro';
-  formulario.telefono.value = paciente.telefono || '';
-  formulario.email.value = paciente.email || '';
-  formulario.cobertura.value = paciente.cobertura || '';
-  formulario.plan.value = paciente.plan || '';
-  formulario.numero_afiliado.value = paciente.numero_afiliado || '';
-  formulario.direccion.value = paciente.direccion || '';
+  form.nombre.value = paciente.nombre || '';
+  form.apellido.value = paciente.apellido || '';
+  form.dni.value = paciente.dni || '';
+  form.fecha_nacimiento.value = paciente.fecha_nacimiento ? paciente.fecha_nacimiento.substring(0,10) : '';
+  form.sexo.value = paciente.sexo || 'otro';
+  form.telefono.value = paciente.telefono || '';
+  form.email.value = paciente.email || '';
+  form.cobertura.value = paciente.cobertura || '';
+  form.plan.value = paciente.plan || '';
+  form.numero_afiliado.value = paciente.numero_afiliado || '';
+  form.direccion.value = paciente.direccion || '';
 
   if (abrir) card.classList.remove('hidden');
 
   // Wire eventos una sola vez
-  if (!formulario._wired) {
-    formulario.addEventListener('submit', async (e) => {
+  if (!form._wired) {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const id = formulario.dataset.id;
-      const datos = Object.fromEntries(new FormData(formulario).entries());
+      const id = form.dataset.id;
+      const data = Object.fromEntries(new FormData(form).entries());
 
-      if (!validarDNI(datos.dni)) {
+      if (!validarDNI(data.dni)) {
         mostrarAlerta('DNI inválido', 'error');
         return;
       }
-      if (datos.email && !validarEmail(datos.email)) {
+      if (data.email && !validarEmail(data.email)) {
         mostrarAlerta('Email inválido', 'error');
         return;
       }
@@ -257,7 +257,7 @@ function prepararEdicionPaciente(paciente, abrir = false) {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify(datos)
+          body: JSON.stringify(data)
         });
         const result = await resp.json();
         if (resp.ok) {
@@ -276,7 +276,7 @@ function prepararEdicionPaciente(paciente, abrir = false) {
     document.getElementById('btn-cancelar-editar').addEventListener('click', () => {
       document.getElementById('card-editar').classList.add('hidden');
     });
-    formulario._wired = true;
+    form._wired = true;
   }
 }
 
@@ -296,4 +296,3 @@ async function eliminarPaciente(id) {
     manejarErrorAPI(e);
   }
 }
-

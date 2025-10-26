@@ -1,4 +1,4 @@
-// * Lógica de consultas
+// * Lógica de Consultas
 // * Permite listar todas, filtrar por fecha/paciente y crear nuevas consultas.
 // * Incluye paginación simple en cliente.
 
@@ -39,7 +39,7 @@ async function cargarConsultas(opcion = { tipo: 'todas' }) {
 // * integrarSelectorPacientesConsulta(): usa el modal selector para completar id_paciente
 function integrarSelectorPacientesConsulta() {
   const display = document.getElementById('paciente-display-consulta');
-  const hidden = document.querySelector('#formulario-nueva-consulta [name="id_paciente"]');
+  const hidden = document.querySelector('#form-nueva-consulta [name="id_paciente"]');
   const btn = document.getElementById('btn-seleccionar-paciente-consulta');
   if (!display || !hidden || !btn) return;
   btn.addEventListener('click', () => {
@@ -80,19 +80,19 @@ function configurarEventosConsultas() {
 
   document.getElementById('btn-cancelar-consulta').addEventListener('click', () => {
     document.getElementById('card-nueva-consulta').classList.add('hidden');
-    limpiarFormulario('formulario-nueva-consulta');
+    limpiarFormulario('form-nueva-consulta');
   });
 
-  document.getElementById('formulario-nueva-consulta').addEventListener('submit', async (e) => {
+  document.getElementById('form-nueva-consulta').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const datos = Object.fromEntries(new FormData(e.target).entries());
+    const data = Object.fromEntries(new FormData(e.target).entries());
 
-    if (!datos.motivo_consulta || !datos.id_paciente || !datos.fecha) {
+    if (!data.motivo_consulta || !data.id_paciente || !data.fecha) {
       mostrarAlerta('Paciente, fecha y motivo de consulta son requeridos', 'error');
       return;
     }
 
-    if (!datos.id_paciente || !datos.fecha) {
+    if (!data.id_paciente || !data.fecha) {
       mostrarAlerta('ID Paciente y fecha son requeridos', 'error');
       return;
     }
@@ -106,13 +106,13 @@ function configurarEventosConsultas() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(datos)
+        body: JSON.stringify(data)
       });
       const result = await resp.json();
       if (resp.ok) {
-        mostrarAlerta('consulta creada con éxito', 'success');
+        mostrarAlerta('Consulta creada con éxito', 'success');
         document.getElementById('card-nueva-consulta').classList.add('hidden');
-        limpiarFormulario('formulario-nueva-consulta');
+        limpiarFormulario('form-nueva-consulta');
         await cargarConsultas();
       } else {
         manejarErrorAPI(result, resp);
@@ -132,7 +132,7 @@ async function eliminarConsulta(id) {
   try {
     const resp = await fetch(`/api/consultas/${id}`, { method: 'DELETE', credentials: 'include' });
     if (resp.ok) {
-      mostrarAlerta('consulta eliminada', 'success');
+      mostrarAlerta('Consulta eliminada', 'success');
       await cargarConsultas();
     } else {
       const result = await resp.json();
@@ -161,15 +161,15 @@ function renderConsultasPagina() {
         <td>${formatearFecha(c.fecha)}</td>
         <td>
           <span>${c.nombre} ${c.apellido} (DNI ${c.dni})</span>
-          <boton class="btn btn-sm ml-2" onclick="abrirPerfilPaciente(${c.id_paciente || c.paciente_id})">Ver perfil</boton>
+          <button class="btn btn-sm ml-2" onclick="abrirPerfilPaciente(${c.id_paciente || c.paciente_id})">Ver perfil</button>
         </td>
         <td>${c.motivo_consulta || '-'}</td>
         <td>${c.diagnostico || '-'}</td>
         <td>${c.tratamiento || '-'}</td>
         <td>
           <div class="flex gap-2">
-            <boton class="btn btn-sm" onclick="verConsulta(${c.id_consulta})"><span class="material-symbols-outlined" aria-hidden="true">visibility</span> Ver</boton>
-            <boton class="btn btn-sm btn-error" onclick="eliminarConsulta(${c.id_consulta})">Eliminar</boton>
+            <button class="btn btn-sm" onclick="verConsulta(${c.id_consulta})"><span class="material-symbols-outlined" aria-hidden="true">visibility</span> Ver</button>
+            <button class="btn btn-sm btn-error" onclick="eliminarConsulta(${c.id_consulta})">Eliminar</button>
           </div>
         </td>
       </tr>
@@ -191,13 +191,12 @@ function renderPaginacionConsultas() {
   const totalPaginas = Math.max(1, Math.ceil(total / tam));
   const cont = document.getElementById('paginacion-consultas');
   if (!cont) return;
-  const btn = (label, disabled, onClick) => `<boton class="btn btn-sm ${disabled ? 'boton-secundario' : ''}" ${disabled ? 'disabled' : ''} onclick="${onClick}">${label}</boton>`;
+  const btn = (label, disabled, onClick) => `<button class="btn btn-sm ${disabled ? 'btn-secondary' : ''}" ${disabled ? 'disabled' : ''} onclick="${onClick}">${label}</button>`;
   const items = [];
   items.push(btn('« Anterior', pagina === 1, `cambiarPaginaConsultas(${pagina - 1})`));
   const maxNums = 5; let start = Math.max(1, pagina - Math.floor(maxNums/2)); let end = Math.min(totalPaginas, start + maxNums - 1); if (end - start < maxNums - 1) start = Math.max(1, end - maxNums + 1);
-  for (let i = start; i <= end; i++) items.push(`<boton class="btn btn-sm ${i===pagina?'boton-primario':''}" onclick="cambiarPaginaConsultas(${i})">${i}</boton>`);
+  for (let i = start; i <= end; i++) items.push(`<button class="btn btn-sm ${i===pagina?'btn-primary':''}" onclick="cambiarPaginaConsultas(${i})">${i}</button>`);
   items.push(btn('Siguiente »', pagina === totalPaginas, `cambiarPaginaConsultas(${pagina + 1})`));
   cont.innerHTML = items.join(' ');
   window.cambiarPaginaConsultas = (p) => { if (p<1 || p>totalPaginas) return; estadoConsultas.pagina = p; renderConsultasPagina(); };
 }
-

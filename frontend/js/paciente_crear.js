@@ -17,32 +17,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   const apellidoPref = params.get('apellido');
   const coberturaPref = params.get('cobertura');
   if (nombrePref) {
-    const el = document.querySelector('#formulario-crear-paciente [name="nombre"]');
-    if (el) el.valor = nombrePref;
+    const el = document.querySelector('#form-crear-paciente [name="nombre"]');
+    if (el) el.value = nombrePref;
   }
   if (apellidoPref) {
-    const el = document.querySelector('#formulario-crear-paciente [name="apellido"]');
-    if (el) el.valor = apellidoPref;
+    const el = document.querySelector('#form-crear-paciente [name="apellido"]');
+    if (el) el.value = apellidoPref;
   }
   if (coberturaPref) {
-    const el = document.querySelector('#formulario-crear-paciente [name="cobertura"]');
-    if (el) el.valor = coberturaPref;
+    const el = document.querySelector('#form-crear-paciente [name="cobertura"]');
+    if (el) el.value = coberturaPref;
   }
 
   // Mostrar edad al lado de la fecha de nacimiento (igual que en perfil)
-  const formulario = document.getElementById('formulario-crear-paciente');
-  const campoFecha = formulario ? formulario.querySelector('entrada[name="fecha_nacimiento"]') : null;
+  const form = document.getElementById('form-crear-paciente');
+  const campoFecha = form ? form.querySelector('input[name="fecha_nacimiento"]') : null;
   const spanEdad = document.getElementById('edad-texto');
   const actualizarEdadCrear = () => {
     if (!campoFecha || !spanEdad) return;
-    const fecha = campoFecha.valor;
+    const fecha = campoFecha.value;
     if (!fecha) { spanEdad.textContent = ''; return; }
     const edad = calcularEdad(fecha);
     if (edad === '' || isNaN(edad) || edad < 0) { spanEdad.textContent = ''; return; }
     spanEdad.textContent = `${edad} años`;
   };
   if (campoFecha) {
-    ['change', 'entrada'].forEach(ev => campoFecha.addEventListener(ev, actualizarEdadCrear));
+    ['change', 'input'].forEach(ev => campoFecha.addEventListener(ev, actualizarEdadCrear));
     // Inicial
     actualizarEdadCrear();
   }
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Auto-grow para textareas (igual comportamiento que en perfil)
   function inicializarAutoGrowTextareasCrear() {
     try {
-      const areas = (formulario || document).querySelectorAll('#formulario-crear-paciente textarea');
+      const areas = (form || document).querySelectorAll('#form-crear-paciente textarea');
       areas.forEach((area) => {
         const autoGrow = () => {
           area.style.height = 'auto';
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         // Inicializar y bindear eventos
         requestAnimationFrame(autoGrow);
-        area.addEventListener('entrada', autoGrow);
+        area.addEventListener('input', autoGrow);
         area.addEventListener('change', autoGrow);
         area.addEventListener('paste', () => setTimeout(autoGrow, 0));
       });
@@ -82,15 +82,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     else window.history.length > 1 ? window.history.back() : window.location.href = 'inicio.html';
   });
 
-  document.getElementById('formulario-crear-paciente').addEventListener('submit', async (e) => {
+  document.getElementById('form-crear-paciente').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const datos = Object.fromEntries(new FormData(e.target).entries());
+    const data = Object.fromEntries(new FormData(e.target).entries());
 
-    if (!validarDNI(datos.dni)) { mostrarAlerta('DNI inválido', 'error'); return; }
-    if (datos.email && !validarEmail(datos.email)) { mostrarAlerta('Email inválido', 'error'); return; }
+    if (!validarDNI(data.dni)) { mostrarAlerta('DNI inválido', 'error'); return; }
+    if (data.email && !validarEmail(data.email)) { mostrarAlerta('Email inválido', 'error'); return; }
 
     try {
-      const resp = await fetch('/api/pacientes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(datos) });
+      const resp = await fetch('/api/pacientes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(data) });
       const result = await resp.json();
       if (resp.ok) {
         mostrarAlerta('Paciente creado', 'success');
@@ -105,4 +105,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { manejarErrorAPI(e); }
   });
 });
-

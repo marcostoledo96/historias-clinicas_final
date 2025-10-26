@@ -32,4 +32,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { manejarErrorAPI(e); }
   });
 });
-

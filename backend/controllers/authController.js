@@ -128,7 +128,7 @@ const authController = {
 };
 
 // Solicitar recuperación: genera un código de 6 dígitos y lo "envía" (log)
-controladorAutenticacion.solicitarRecuperacion = async (req, res) => {
+authController.solicitarRecuperacion = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email requerido' });
@@ -148,7 +148,7 @@ controladorAutenticacion.solicitarRecuperacion = async (req, res) => {
 };
 
 // Restablecer contraseña con código
-controladorAutenticacion.restablecerConCodigo = async (req, res) => {
+authController.restablecerConCodigo = async (req, res) => {
   try {
     const { email, codigo, password } = req.body;
     if (!email || !codigo || !password) return res.status(400).json({ error: 'Campos requeridos' });
@@ -173,9 +173,8 @@ controladorAutenticacion.restablecerConCodigo = async (req, res) => {
   }
 };
 
-module.exports = controladorAutenticacion;
 // Nuevos endpoints de perfil
-controladorAutenticacion.obtenerPerfil = async (req, res) => {
+authController.obtenerPerfil = async (req, res) => {
   try {
     const id = req.session.usuario?.id;
     if (!id) return res.status(401).json({ error: 'No autenticado' });
@@ -189,7 +188,7 @@ controladorAutenticacion.obtenerPerfil = async (req, res) => {
   }
 };
 
-controladorAutenticacion.actualizarPerfil = async (req, res) => {
+authController.actualizarPerfil = async (req, res) => {
   try {
     const id = req.session.usuario?.id;
     if (!id) return res.status(401).json({ error: 'No autenticado' });
@@ -211,7 +210,7 @@ controladorAutenticacion.actualizarPerfil = async (req, res) => {
   }
 };
 
-controladorAutenticacion.cambiarPassword = async (req, res) => {
+authController.cambiarPassword = async (req, res) => {
   try {
     const id = req.session.usuario?.id;
     if (!id) return res.status(401).json({ error: 'No autenticado' });

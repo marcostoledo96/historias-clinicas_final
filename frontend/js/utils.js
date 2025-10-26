@@ -1,83 +1,35 @@
-// Utilidades generales para la aplicación
-// Aquí pongo funciones helper de UI y validaciones que uso en varias páginas
-// Convención: mostrarAlerta(mensaje, tipo) donde tipo puede ser success, error, warning, info
-
-// Variable global para saber si está en modo demo
-let esModoDemo = false;
+// * Utilidades generales para la aplicación
+// * Este módulo agrupa helpers de UI y validaciones que se usan en varias páginas.
+// ? Convención de mensajes: mostrarAlerta(mensaje, tipo) donde tipo ∈ {success, error, warning, info}
+// ! No hace llamadas a API; sólo maneja DOM y formatos.
 
 // Función para mostrar alertas
 function mostrarAlerta(mensaje, tipo = 'info') {
-  const contenedorAlertas = document.getElementById('alert-container');
-  if (!contenedorAlertas) return;
+  const alertContainer = document.getElementById('alert-container');
+  if (!alertContainer) return;
   
-  // Limpio alertas previas
-  contenedorAlertas.innerHTML = '';
+  // Limpiar alertas previas
+  alertContainer.innerHTML = '';
   
-  const divAlerta = document.createElement('div');
-  divAlerta.className = `alert alert-${tipo}`;
-  divAlerta.textContent = mensaje;
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${tipo}`;
+  alertDiv.textContent = mensaje;
   
-  contenedorAlertas.appendChild(divAlerta);
+  alertContainer.appendChild(alertDiv);
   
-  // Se oculta automáticamente después de 5 segundos
+  // Auto-ocultar después de 5 segundos
   setTimeout(() => {
-    divAlerta.remove();
+    alertDiv.remove();
   }, 5000);
-}
-
-// Función para mostrar banner de modo demo
-function mostrarBannerDemo() {
-  // Evito duplicar banners
-  if (document.getElementById('banner-demo')) return;
-  
-  const banner = document.createElement('div');
-  banner.id = 'banner-demo';
-  banner.className = 'banner-demo';
-  banner.innerHTML = `
-    <div class="contenido-demo">
-      <span class="icono-demo">🎭</span>
-      <span class="texto-demo">MODO DEMO - Los cambios son temporales y se borrarán al cerrar sesión</span>
-      <button class="cerrar-demo" onclick="ocultarBannerDemo()">×</button>
-    </div>
-  `;
-  
-  // Lo inserto al principio del body
-  document.body.insertBefore(banner, document.body.firstChild);
-  
-  esModoDemo = true;
-}
-
-// Función para ocultar banner demo
-function ocultarBannerDemo() {
-  const banner = document.getElementById('banner-demo');
-  if (banner) {
-    banner.remove();
-  }
-}
-
-// Función para interceptar respuestas de API y detectar modo demo
-function interceptarRespuestaAPI(response, data) {
-  // Verifico header de modo demo
-  if (response.headers.get('X-Demo-Mode') === 'true') {
-    mostrarBannerDemo();
-  }
-  
-  // Verifico si la respuesta indica modo demo
-  if (data && data.demo === true) {
-    mostrarBannerDemo();
-  }
-  
-  return data;
 }
 
 // Función para formatear fechas
 // * formatearFecha(fecha)
-// > Entrada: fecha en formato aceptado por fecha (string/fecha). Salida: DD/MM/AAAA (es-AR).
-function formatearFecha(valor) {
-  if (!valor) return '';
-  const d = new Date(valor);
-  if (isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('es-AR');
+// > Entrada: fecha en formato aceptado por Date (string/Date). Salida: DD/MM/AAAA (es-AR).
+function formatearFecha(fecha) {
+  if (!fecha) return '';
+  const date = new Date(fecha);
+  return date.toLocaleDateString('es-AR');
 }
 
 // Función para formatear fecha y hora
@@ -90,12 +42,13 @@ function calcularEdad(fechaNacimiento) {
   if (!fechaNacimiento) return '';
   const hoy = new Date();
   const nacimiento = new Date(fechaNacimiento);
-  if (isNaN(nacimiento.getTime())) return '';
   let edad = hoy.getFullYear() - nacimiento.getFullYear();
   const mes = hoy.getMonth() - nacimiento.getMonth();
+  
   if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
     edad--;
   }
+  
   return edad;
 }
 
@@ -121,7 +74,7 @@ function validarDNI(dni) {
 // * getBadgeSituacion(situacion)
 // > Devuelve HTML para badge según estado del turno.
 function getBadgeSituacion(situacion) {
-  const insignias = {
+  const badges = {
     'programado': 'badge-programado',
     'en_espera': 'badge-en-espera', 
     'atendido': 'badge-atendido',
@@ -137,16 +90,16 @@ function getBadgeSituacion(situacion) {
     'cancelado': 'Cancelado'
   };
   
-  return `<span class="badge ${insignias[situacion] || 'badge-secondary'}">${textos[situacion] || situacion}</span>`;
+  return `<span class="badge ${badges[situacion] || 'badge-secondary'}">${textos[situacion] || situacion}</span>`;
 }
 
 // Función para limpiar formulario
 // * limpiarFormulario(formId)
-// > Ejecuta formulario.reset() si existe el formulario con ese id.
+// > Ejecuta form.reset() si existe el formulario con ese id.
 function limpiarFormulario(formId) {
-  const formulario = document.getElementById(formId);
-  if (formulario) {
-    formulario.reset();
+  const form = document.getElementById(formId);
+  if (form) {
+    form.reset();
   }
 }
 
@@ -161,14 +114,14 @@ function confirmarAccion(mensaje) {
 // * debounce(func, wait)
 // > Evita ejecuciones repetidas; ejecuta la función luego de inactividad (wait ms).
 function debounce(func, wait) {
-  let temporizador;
+  let timeout;
   return function executedFunction(...args) {
-    const despues = () => {
-      clearTimeout(temporizador);
+    const later = () => {
+      clearTimeout(timeout);
       func(...args);
     };
-    clearTimeout(temporizador);
-    temporizador = setTimeout(despues, wait);
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
   };
 }
 
@@ -176,16 +129,16 @@ function debounce(func, wait) {
 // * mostrarElemento/ocultarElemento
 // > Alternan la clase .hidden en elementos por id.
 function mostrarElemento(elementId) {
-  const elemento = document.getElementById(elementId);
-  if (elemento) {
-    elemento.classList.remove('hidden');
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.classList.remove('hidden');
   }
 }
 
 function ocultarElemento(elementId) {
-  const elemento = document.getElementById(elementId);
-  if (elemento) {
-    elemento.classList.add('hidden');
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.classList.add('hidden');
   }
 }
 
@@ -194,24 +147,24 @@ function ocultarElemento(elementId) {
 
 // Función para loading en botones
 // * setButtonLoading(buttonId, isLoading)
-// > Deshabilita/rehabilita un botón y gestiona un cargando interno.
+// > Deshabilita/rehabilita un botón y gestiona un spinner interno.
 function setButtonLoading(buttonId, isLoading) {
-  const boton = document.getElementById(buttonId);
-  if (!boton) return;
+  const btn = document.getElementById(buttonId);
+  if (!btn) return;
   if (isLoading) {
-    boton.disabled = true;
-    // Añadir cargando si no existe
-    let cargando = boton.querySelector('.loading');
-    if (!cargando) {
-      cargando = document.createElement('span');
-      cargando.className = 'loading';
-      cargando.setAttribute('aria-hidden', 'true');
-      boton.prepend(cargando);
+    btn.disabled = true;
+    // Añadir spinner si no existe
+    let spinner = btn.querySelector('.loading');
+    if (!spinner) {
+      spinner = document.createElement('span');
+      spinner.className = 'loading';
+      spinner.setAttribute('aria-hidden', 'true');
+      btn.prepend(spinner);
     }
   } else {
-    boton.disabled = false;
-    const cargando = boton.querySelector('.loading');
-    if (cargando) cargando.remove();
+    btn.disabled = false;
+    const spinner = btn.querySelector('.loading');
+    if (spinner) spinner.remove();
   }
 }
 
@@ -290,4 +243,3 @@ function abrirPerfilPaciente(id, editar = false) {
     document.documentElement.setAttribute('data-theme', 'light');
   }
 })();
-

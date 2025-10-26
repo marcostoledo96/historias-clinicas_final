@@ -1,10 +1,11 @@
-// Componentes reutilizables (header/footer + helpers de UI)
-// Este módulo carga fragmentos HTML comunes (header/footer) y configura:
+// ! Componentes reutilizables (header/footer + helpers de UI)
+// * Este módulo carga fragmentos HTML comunes (header/footer) y configura:
 //   - Menú de usuario accesible (click fuera/Escape cierran)
 //   - Toggle de tema persistente en localStorage
 //   - Menú de navegación responsive
 //   - Heurísticas para reducir autofill/guardar contraseñas en inputs sensibles
-// Lo uso en todas las páginas con layout principal
+// ? Requerido por: todas las páginas con layout principal
+// TODO: incorporar lazy-loading del footer si pesa o tiene recursos costosos
 
 // Cargar header en la página
 async function cargarHeader() {
@@ -12,7 +13,7 @@ async function cargarHeader() {
     const response = await fetch('components/header.html');
     const headerHTML = await response.text();
     
-    const headerContainer = document.getElementById('encabezado-container') || document.getElementById('header-container');
+    const headerContainer = document.getElementById('header-container');
     if (headerContainer) {
       headerContainer.innerHTML = headerHTML;
     }
@@ -27,7 +28,7 @@ async function cargarFooter() {
     const response = await fetch('components/footer.html');
     const footerHTML = await response.text();
     
-    const footerContainer = document.getElementById('pie-pagina-container') || document.getElementById('footer-container');
+    const footerContainer = document.getElementById('footer-container');
     if (footerContainer) {
       footerContainer.innerHTML = footerHTML;
     }
@@ -62,7 +63,7 @@ async function inicializarPagina() {
 
 function configurarHeaderInteractivo() {
   // Dropdown usuario
-  const btnUser = document.getElementById('user-menu-button') || document.getElementById('usuario-menu-boton');
+  const btnUser = document.getElementById('user-menu-button');
   const dropdown = document.getElementById('user-menu-dropdown');
   const userMenuContainer = btnUser ? btnUser.closest('.user-menu') : null;
   if (btnUser && dropdown) {
@@ -94,7 +95,7 @@ function configurarHeaderInteractivo() {
   }
 
   // Toggle tema
-  const btnTheme = document.getElementById('btn-toggle-theme') || document.getElementById('boton-toggle-theme');
+  const btnTheme = document.getElementById('btn-toggle-theme');
   if (btnTheme) {
     btnTheme.addEventListener('click', () => {
       const actual = document.documentElement.getAttribute('data-theme') === 'dark' ? 'oscuro' : 'claro';
@@ -109,8 +110,8 @@ function configurarHeaderInteractivo() {
   }
 
   // Toggle menú navegación (responsive)
-  const btnNav = document.getElementById('btn-nav-toggle') || document.getElementById('boton-boton-menu');
-  const navMenu = document.getElementById('nav-menu') || document.getElementById('menu-navegacion');
+  const btnNav = document.getElementById('btn-nav-toggle');
+  const navMenu = document.getElementById('nav-menu');
   if (btnNav && navMenu) {
     btnNav.addEventListener('click', () => {
       const abierto = navMenu.classList.toggle('open');

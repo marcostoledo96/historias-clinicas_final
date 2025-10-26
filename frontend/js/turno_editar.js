@@ -1,4 +1,4 @@
-// * Editar turno
+// * Editar Turno
 // * Carga un turno por id y permite actualizar campos. Normaliza cadenas vacías a null para evitar errores de DB.
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -19,17 +19,17 @@ async function cargarTurno(id) {
     if (!resp.ok) return manejarErrorAPI(null, resp);
     const t = await resp.json();
 
-    const formulario = document.getElementById('formulario-editar-turno');
-    formulario.paciente.value = `${t.nombre} ${t.apellido}`;
-    formulario.dia.value = t.dia ? t.dia.substring(0,10) : '';
-    formulario.horario.value = t.horario ? t.horario.substring(0,5) : '';
-    formulario.cobertura.value = t.cobertura || '';
-    formulario.hora_llegada.value = t.hora_llegada ? t.hora_llegada.substring(0,5) : '';
-    formulario.situacion.value = t.situacion || 'programado';
-    formulario.primera_vez.checked = !!t.primera_vez;
-    formulario.detalle.value = t.detalle || '';
+    const form = document.getElementById('form-editar-turno');
+    form.paciente.value = `${t.nombre} ${t.apellido}`;
+    form.dia.value = t.dia ? t.dia.substring(0,10) : '';
+    form.horario.value = t.horario ? t.horario.substring(0,5) : '';
+    form.cobertura.value = t.cobertura || '';
+    form.hora_llegada.value = t.hora_llegada ? t.hora_llegada.substring(0,5) : '';
+    form.situacion.value = t.situacion || 'programado';
+    form.primera_vez.checked = !!t.primera_vez;
+    form.detalle.value = t.detalle || '';
 
-    formulario.dataset.id = id;
+    form.dataset.id = id;
   } catch (e) { manejarErrorAPI(e); }
 }
 
@@ -39,35 +39,35 @@ function configurarEventos(id, dia) {
     window.location.href = `turnos.html${dia ? `?dia=${dia}`:''}`;
   });
 
-  document.getElementById('formulario-editar-turno').addEventListener('submit', async (e) => {
+  document.getElementById('form-editar-turno').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const formulario = e.target;
-    const datos = Object.fromEntries(new FormData(formulario).entries());
-    datos.primera_vez = formulario.primera_vez.checked;
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form).entries());
+    data.primera_vez = form.primera_vez.checked;
 
     // Normalizar opcionales: enviar null si están vacíos (evita errores de TIME en backend/DB)
-    if (datos.hora_llegada !== undefined && String(datos.hora_llegada).trim() === '') {
-      datos.hora_llegada = null;
+    if (data.hora_llegada !== undefined && String(data.hora_llegada).trim() === '') {
+      data.hora_llegada = null;
     }
-    if (datos.cobertura !== undefined && String(datos.cobertura).trim() === '') {
-      datos.cobertura = null;
+    if (data.cobertura !== undefined && String(data.cobertura).trim() === '') {
+      data.cobertura = null;
     }
-    if (datos.detalle !== undefined && String(datos.detalle).trim() === '') {
-      datos.detalle = null;
+    if (data.detalle !== undefined && String(data.detalle).trim() === '') {
+      data.detalle = null;
     }
 
-    if (!datos.dia || !datos.horario) {
+    if (!data.dia || !data.horario) {
       mostrarAlerta('Día y horario son requeridos', 'error');
       return;
     }
 
     try {
       const resp = await fetch(`/api/turnos/${id}`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(datos)
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(data)
       });
       const result = await resp.json();
       if (resp.ok) {
-        mostrarAlerta('turno actualizado', 'success');
+        mostrarAlerta('Turno actualizado', 'success');
       } else {
         manejarErrorAPI(result, resp);
         mostrarAlerta(result.error || 'No se pudo actualizar', 'error');
@@ -75,4 +75,3 @@ function configurarEventos(id, dia) {
     } catch (e) { manejarErrorAPI(e); }
   });
 }
-

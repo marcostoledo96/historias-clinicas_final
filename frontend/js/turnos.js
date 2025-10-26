@@ -1,4 +1,4 @@
-// * Lógica de turnos (lista agenda por día)
+// * Lógica de Turnos (lista agenda por día)
 // * Muestra turnos de un día, permite navegar entre fechas y gestionar estados.
 // * Alta de turno se abre en nueva ventana (turno_nuevo.html). Sin paginación en el listado.
 
@@ -50,7 +50,7 @@ async function cargarTurnosHoy() {
 // * integrarSelectorPacientesTurno(): conecta input/botón con el modal selector reutilizable
 function integrarSelectorPacientesTurno() {
   const display = document.getElementById('paciente-input');
-  const hidden = document.querySelector('#formulario-nuevo-turno [name="id_paciente"]');
+  const hidden = document.querySelector('#form-nuevo-turno [name="id_paciente"]');
   const btn = document.getElementById('btn-seleccionar-paciente-turno');
   if (!display || !hidden || !btn) return;
 
@@ -80,7 +80,7 @@ function integrarSelectorPacientesTurno() {
 function integrarAutocompletePaciente() {
   const input = document.getElementById('paciente-input');
   const menu = document.getElementById('paciente-sugerencias');
-  const hidden = document.querySelector('#formulario-nuevo-turno [name="id_paciente"]');
+  const hidden = document.querySelector('#form-nuevo-turno [name="id_paciente"]');
   if (!input || !menu || !hidden) return;
 
   let timer = null;
@@ -89,7 +89,7 @@ function integrarAutocompletePaciente() {
   const mostrar = (items) => {
     if (!items.length) { ocultar(); return; }
     menu.innerHTML = items.map(p => `
-      <div class="item-sugerencia" datos-id="${p.id_paciente}" style="padding:8px; cursor:pointer; display:flex; justify-content:space-between;">
+      <div class="item-sugerencia" data-id="${p.id_paciente}" style="padding:8px; cursor:pointer; display:flex; justify-content:space-between;">
         <span>${p.nombre} ${p.apellido}</span>
         <span style="color: var(--color-gray-600);">DNI ${p.dni || '-'}</span>
       </div>
@@ -102,8 +102,8 @@ function integrarAutocompletePaciente() {
       const url = q ? `/api/pacientes?buscar=${encodeURIComponent(q)}` : '/api/pacientes';
       const resp = await fetch(url, { credentials: 'include' });
       if (!resp.ok) { manejarErrorAPI(null, resp); return; }
-      const datos = await resp.json();
-      opciones = datos.slice(0, 20);
+      const data = await resp.json();
+      opciones = data.slice(0, 20);
       mostrar(opciones);
     } catch (e) { manejarErrorAPI(e); }
   };
@@ -142,9 +142,9 @@ function integrarAutocompletePaciente() {
   });
 
   menu.addEventListener('click', (e) => {
-    const fila = e.target.closest('.item-sugerencia');
-    if (!fila) return;
-    const id = parseInt(fila.dataset.id, 10);
+    const row = e.target.closest('.item-sugerencia');
+    if (!row) return;
+    const id = parseInt(row.dataset.id, 10);
     const p = opciones.find(x => x.id_paciente === id);
     if (!p) return;
     input.value = `${p.nombre} ${p.apellido} (DNI ${p.dni || '-'})`;
@@ -202,9 +202,9 @@ function renderTurnosPagina() {
         <td>
           <span>${t.nombre} ${t.apellido}</span>
             ${t.id_paciente ? `
-              <boton class="btn btn-sm ml-2" onclick="abrirPerfilPaciente(${t.id_paciente}, ${t.dni ? 'false' : 'true'})">${t.dni ? 'Ver perfil' : 'Completar perfil'}</boton>
+              <button class="btn btn-sm ml-2" onclick="abrirPerfilPaciente(${t.id_paciente}, ${t.dni ? 'false' : 'true'})">${t.dni ? 'Ver perfil' : 'Completar perfil'}</button>
             ` : `
-              <boton class="btn btn-sm btn-secondary ml-2" onclick="crearPerfilDesdeTurno('${(t.nombre||'').replace(/'/g, "&#39;")}', '${(t.apellido||'').replace(/'/g, "&#39;")}', '${(t.cobertura||'').replace(/'/g, "&#39;")}')">Crear perfil</boton>
+              <button class="btn btn-sm btn-secondary ml-2" onclick="crearPerfilDesdeTurno('${(t.nombre||'').replace(/'/g, "&#39;")}', '${(t.apellido||'').replace(/'/g, "&#39;")}', '${(t.cobertura||'').replace(/'/g, "&#39;")}')">Crear perfil</button>
             `}
         </td>
         <td>${t.dni}</td>
@@ -214,14 +214,14 @@ function renderTurnosPagina() {
   <td>${t.primera_vez ? '✅' : '-'}</td>
         <td>
           <div class="flex gap-2">
-            <select onchange="cambiarSituacion(${t.id_turno}, this.value)" class="formulario-select select-accion">
+            <select onchange="cambiarSituacion(${t.id_turno}, this.value)" class="form-select select-accion">
               ${['programado','en_espera','atendido','ausente','cancelado'].map(s => {
                 const lbl = labelSituacion(s);
                 return `<option value="${s}" ${s===t.situacion?'selected':''}>${lbl}</option>`;
               }).join('')}
             </select>
-            <boton class="btn btn-sm" onclick="editarTurno(${t.id_turno})"><span class=\"material-symbols-outlined\" aria-hidden=\"true\">edit</span> Editar</boton>
-            <boton class="btn btn-sm btn-error" onclick="eliminarTurno(${t.id_turno})">Eliminar</boton>
+            <button class="btn btn-sm" onclick="editarTurno(${t.id_turno})"><span class=\"material-symbols-outlined\" aria-hidden=\"true\">edit</span> Editar</button>
+            <button class="btn btn-sm btn-error" onclick="eliminarTurno(${t.id_turno})">Eliminar</button>
           </div>
         </td>
       </tr>
@@ -329,11 +329,11 @@ function configurarEventosTurnos() {
   if (btnCancelar) {
     btnCancelar.addEventListener('click', () => {
       document.getElementById('card-nuevo-turno').classList.add('hidden');
-      limpiarFormulario('formulario-nuevo-turno');
+      limpiarFormulario('form-nuevo-turno');
     });
   }
 
-  const formNuevo = document.getElementById('formulario-nuevo-turno');
+  const formNuevo = document.getElementById('form-nuevo-turno');
   if (formNuevo) {
     // Si aún existe el formulario inline en el HTML, lo deshabilitamos para este flujo
     formNuevo.addEventListener('submit', (e) => {
@@ -393,7 +393,7 @@ async function marcarAtendido(idTurno) {
       body: JSON.stringify({ situacion: 'atendido' })
     });
     if (resp.ok) {
-      mostrarAlerta('turno marcado como atendido', 'success');
+      mostrarAlerta('Turno marcado como atendido', 'success');
       await recargarVistaActual();
     } else {
       const result = await resp.json();
@@ -414,7 +414,7 @@ async function marcarCancelado(idTurno) {
       body: JSON.stringify({ situacion: 'cancelado' })
     });
     if (resp.ok) {
-      mostrarAlerta('turno cancelado', 'success');
+      mostrarAlerta('Turno cancelado', 'success');
       await recargarVistaActual();
     } else {
       const result = await resp.json();
@@ -428,11 +428,11 @@ async function marcarCancelado(idTurno) {
 // * cambiarSituacion(idTurno, situacion): actualiza select; si en_espera setea hora_llegada
 async function cambiarSituacion(idTurno, situacion) {
   try {
-    const datos = { situacion };
+    const data = { situacion };
     if (situacion === 'en_espera') {
-      datos.hora_llegada = new Date().toTimeString().substring(0,8);
+      data.hora_llegada = new Date().toTimeString().substring(0,8);
     }
-    const resp = await fetch(`/api/turnos/${idTurno}/situacion`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(datos) });
+    const resp = await fetch(`/api/turnos/${idTurno}/situacion`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(data) });
     if (resp.ok) {
       mostrarAlerta('Situación actualizada', 'success');
       // Actualizar en memoria sin refetch completo
@@ -469,7 +469,7 @@ async function eliminarTurno(idTurno) {
   try {
     const resp = await fetch(`/api/turnos/${idTurno}`, { method: 'DELETE', credentials: 'include' });
     if (resp.ok) {
-      mostrarAlerta('turno eliminado', 'success');
+      mostrarAlerta('Turno eliminado', 'success');
       await recargarVistaActual();
     } else {
       const result = await resp.json();
@@ -479,4 +479,3 @@ async function eliminarTurno(idTurno) {
     manejarErrorAPI(e);
   }
 }
-

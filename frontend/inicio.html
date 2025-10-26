@@ -8,23 +8,23 @@
         <!--
             ! Página: Inicio (Dashboard)
             * Propósito: mostrar resumen del día (stats, turnos de hoy) y accesos rápidos
-            * Scripts: utils.js, auth.js, components.js (layout y encabezado), dashboard.js (carga de datos)
+            * Scripts: utils.js, auth.js, components.js (layout y header), dashboard.js (carga de datos)
             ? Accesibilidad: íconos Google Material; badges de estado en leyenda
         -->
 </head>
 <body>
-    <div class="diseno-principal">
-        <div id="encabezado-container"></div>
+    <div class="main-layout">
+        <div id="header-container"></div>
         
-        <main class="contenido">
+        <main class="content">
             <div id="alert-container"></div>
             
             <div class="card">
-                <div class="card-encabezado">
-                    <h2 class="card-title titulo-pagina"><span class="material-symbols-outlined" aria-hidden="true">home</span> Inicio - Resumen del Día</h2>
+                <div class="card-header">
+                    <h2 class="card-title page-title"><span class="material-symbols-outlined" aria-hidden="true">home</span> Inicio - Resumen del Día</h2>
                 </div>
                 <div class="card-body">
-                    <div class="fila-formulario">
+                    <div class="form-row">
                         <!-- Estadísticas principales -->
                         <div class="card">
                             <div class="card-body text-center">
@@ -59,8 +59,8 @@
             
             <!-- Turnos de hoy -->
             <div class="card mt-4">
-                <div class="card-encabezado">
-                    <h3 class="card-title titulo-seccion"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span> Turnos de Hoy</h3>
+                <div class="card-header">
+                    <h3 class="card-title section-title"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span> Turnos de Hoy</h3>
                 </div>
                 <div class="card-body">
                     <div id="loading-turnos" class="text-center p-4">
@@ -103,15 +103,15 @@
             
             <!-- Accesos rápidos -->
             <div class="card mt-4">
-                <div class="card-encabezado">
-                    <h3 class="card-title titulo-seccion"><span class="material-symbols-outlined" aria-hidden="true">bolt</span> Accesos Rápidos</h3>
+                <div class="card-header">
+                    <h3 class="card-title section-title"><span class="material-symbols-outlined" aria-hidden="true">bolt</span> Accesos Rápidos</h3>
                 </div>
                 <div class="card-body">
-                    <div class="fila-formulario">
-                        <a href="turnos.html" class="boton boton-primario boton-grande">
+                    <div class="form-row">
+                        <a href="turnos.html" class="btn btn-primary btn-lg">
                             <span class="material-symbols-outlined" aria-hidden="true">calendar_month</span> Agenda del Día
                         </a>
-                        <button id="boton-buscar-paciente" class="boton boton-primario boton-grande">
+                        <button id="btn-buscar-paciente" class="btn btn-primary btn-lg">
                             <span class="material-symbols-outlined" aria-hidden="true">search</span> Buscar Paciente
                         </button>
                     </div>
@@ -119,7 +119,7 @@
             </div>
         </main>
         
-        <div id="pie-pagina-container"></div>
+        <div id="footer-container"></div>
     </div>
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
@@ -129,21 +129,20 @@
     <!-- Modal búsqueda rápida de paciente -->
     <div id="modal-busqueda" class="hidden modal-overlay">
         <div class="card" style="max-width: 500px; width: 90%;">
-            <div class="card-encabezado">
+            <div class="card-header">
                 <h3 class="card-title"><span class="material-symbols-outlined" aria-hidden="true">search</span> Búsqueda Rápida de Paciente</h3>
             </div>
             <div class="card-body">
-                <div class="grupo-formulario">
-                    <label for="busqueda-input" class="etiqueta-formulario">Buscar por nombre, apellido o DNI</label>
+                <div class="form-group">
+                    <label for="busqueda-input" class="form-label">Buscar por nombre, apellido o DNI</label>
                     <input type="text" id="busqueda-input" class="form-input" placeholder="Ingresa nombre, apellido o DNI">
                 </div>
                 <div id="resultados-busqueda"></div>
             </div>
-            <div class="card-pie-pagina">
-                <button id="boton-cerrar-modal" class="boton boton-secundario">Cerrar</button>
+            <div class="card-footer">
+                <button id="btn-cerrar-modal" class="btn btn-secondary">Cerrar</button>
             </div>
         </div>
     </div>
 </body>
 </html>
-
