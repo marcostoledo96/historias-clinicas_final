@@ -42,10 +42,13 @@ app.use(cors({
     // Permito cualquier subdominio de vercel.app para la demo
     if (origin && origin.includes('.vercel.app')) return callback(null, true);
 
+    // Permito cualquier localhost o 127.0.0.1 con puerto dinámico en desarrollo
+    if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) return callback(null, true);
+
     // Verifico origins específicos
     if (allowedOrigins.includes(origin)) return callback(null, true);
 
-    console.warn('CORS bloqueó el origen:', origin);
+  console.warn('CORS bloqueó el origen:', origin);
     // No lanzamos error para no romper el servidor; simplemente no habilitamos CORS
     return callback(null, false);
   },
