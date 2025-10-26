@@ -12,6 +12,12 @@ const app = express();
 // Puerto donde va a escuchar el servidor (por defecto 3000)
 const PORT = process.env.PORT || 3000;
 
+// Detrás de proxies (Vercel/Heroku/NGINX) necesitamos confiar en el proxy
+// para que express-session pueda marcar la cookie como Secure correctamente
+if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Middlewares
 // CORS: permito cookies/sesiones desde el frontend y Vercel
 const allowedOrigins = [
@@ -52,15 +58,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Configuración de sesiones
-// Uso sesiones en memoria (en producción sería mejor un store persistente)
+// En serverless la memoria se pierde entre invocaciones, por eso usamos PostgreSQL como store
+const pool = require('./db/connection');
+const PgSession = require('connect-pg-simple')(session);
 app.use(session({
+  store: new PgSession({
+    pool,
+    tableName: 'session',
+    createTableIfMissing: true
+  }),
   secret: process.env.SESSION_SECRET || 'historias_clinicas_secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
     secure: process.env.NODE_ENV === 'production', // HTTPS en producción
-    maxAge: 24 * 60 * 60 * 1000, // 24 horas
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    maxAge: 24 * 60 * 60 * 1000, // 24 horas (se ajusta si remember=true)
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    path: '/'
   }
 }));
 
