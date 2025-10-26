@@ -73,10 +73,11 @@ function interceptarRespuestaAPI(response, data) {
 // Función para formatear fechas
 // * formatearFecha(fecha)
 // > Entrada: fecha en formato aceptado por fecha (string/fecha). Salida: DD/MM/AAAA (es-AR).
-function formatearFecha(fecha) {
-  if (!fecha) return '';
-  const fecha = new fecha(fecha);
-  return fecha.toLocaleDateString('es-AR');
+function formatearFecha(valor) {
+  if (!valor) return '';
+  const d = new Date(valor);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('es-AR');
 }
 
 // Función para formatear fecha y hora
@@ -87,15 +88,14 @@ function formatearFecha(fecha) {
 // > Calcula edad (años) a partir de fecha de nacimiento. Retorna '' si falta.
 function calcularEdad(fechaNacimiento) {
   if (!fechaNacimiento) return '';
-  const hoy = new fecha();
-  const nacimiento = new fecha(fechaNacimiento);
+  const hoy = new Date();
+  const nacimiento = new Date(fechaNacimiento);
+  if (isNaN(nacimiento.getTime())) return '';
   let edad = hoy.getFullYear() - nacimiento.getFullYear();
   const mes = hoy.getMonth() - nacimiento.getMonth();
-  
   if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
     edad--;
   }
-  
   return edad;
 }
 
