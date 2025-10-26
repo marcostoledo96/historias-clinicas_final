@@ -76,7 +76,8 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // HTTPS en producción
+    // 'auto' usa Secure sólo si la request llega por HTTPS (ideal para Vercel) y permite HTTP en local
+    secure: 'auto',
     maxAge: 24 * 60 * 60 * 1000, // 24 horas (se ajusta si remember=true)
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     path: '/'
