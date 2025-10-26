@@ -11,25 +11,33 @@ const authController = {
   // * Iniciar sesión: valida credenciales, crea sesión y soporta "Recordarme"
   login: async (req, res) => {
     try {
-  const { email, password, remember } = req.body;
+      console.log('Login attempt:', { email: req.body?.email, hasPassword: !!req.body?.password });
+      
+      const { email, password, remember } = req.body;
 
       if (!email || !password) {
+        console.log('Missing credentials');
         return res.status(400).json({ error: 'Email y contraseña son requeridos' });
       }
 
       // Buscar usuario por email
+      console.log('Searching user by email:', email);
       const usuario = await Usuario.buscarPorEmail(email);
       if (!usuario) {
+        console.log('User not found');
         return res.status(404).json({ error: 'Usuario no encontrado' });
       }
 
       // Verificar contraseña
+      console.log('Verifying password');
       const passwordValido = await bcrypt.compare(password, usuario.password_hash);
       if (!passwordValido) {
+        console.log('Invalid password');
         return res.status(401).json({ error: 'Credenciales inválidas' });
       }
 
       // Crear sesión
+      console.log('Creating session for user:', usuario.id_usuario);
       req.session.usuarioId = usuario.id_usuario;
       req.session.usuario = {
         id: usuario.id_usuario,
@@ -47,6 +55,7 @@ const authController = {
         req.session.cookie.expires = false;
       }
 
+      console.log('Login successful');
       res.json({
         mensaje: 'Login exitoso',
         usuario: {
@@ -58,7 +67,8 @@ const authController = {
       });
 
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error('Error in login controller:', error);
+      console.error('Error stack:', error.stack);
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   },
