@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const Usuario = require('../models/Usuario');
-const { cleanupDemoData, DEMO_EMAILS } = require('../middlewares/demoMode');
+const { limpiarDatosDemo, EMAILS_DEMO } = require('../middlewares/demoMode');
 
 // Controlador de autenticación y perfil
 // Manejo login/logout, registro de usuarios y recuperación de contraseñas para demo
@@ -30,32 +30,46 @@ const controladorAutenticacion = {
         return res.status(401).json({ error: 'Credenciales inválidas' });
       }
 
-      // Crear sesión
-      req.session.usuarioId = usuario.id_usuario;
-      req.session.usuario = {
-        id: usuario.id_usuario,
-        email: usuario.email,
-        nombre: usuario.nombre_completo,
-        rol: usuario.rol
-      };
+      // Regenerar sesión para seguridad y asegurar persistencia antes de responder
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error('Error regenerando sesión:', err);
+          return res.status(500).json({ error: 'Error iniciando sesión' });
+        }
 
-      // Si el usuario eligió "mantener sesión iniciada", extender duración de cookie (30 días)
-      if (remember) {
-        const dias30 = 30 * 24 * 60 * 60 * 1000;
-        req.session.cookie.maxAge = dias30;
-      } else {
-        // Cookie de sesión (hasta cerrar navegador)
-        req.session.cookie.expires = false;
-      }
-
-      res.json({
-        mensaje: 'Login exitoso',
-        usuario: {
+        req.session.usuarioId = usuario.id_usuario;
+        req.session.usuario = {
           id: usuario.id_usuario,
           email: usuario.email,
           nombre: usuario.nombre_completo,
           rol: usuario.rol
+        };
+
+        // Si el usuario eligió "mantener sesión iniciada", extender duración de cookie (30 días)
+        if (remember) {
+          const dias30 = 30 * 24 * 60 * 60 * 1000;
+          req.session.cookie.maxAge = dias30;
+        } else {
+          // Cookie de sesión (hasta cerrar navegador)
+          req.session.cookie.expires = false;
         }
+
+        req.session.save((err2) => {
+          if (err2) {
+            console.error('Error guardando sesión:', err2);
+            return res.status(500).json({ error: 'Error iniciando sesión' });
+          }
+
+          res.json({
+            mensaje: 'Login exitoso',
+            usuario: {
+              id: usuario.id_usuario,
+              email: usuario.email,
+              nombre: usuario.nombre_completo,
+              rol: usuario.rol
+            }
+          });
+        });
       });
 
     } catch (error) {
@@ -67,8 +81,8 @@ const controladorAutenticacion = {
   // Cerrar sesión y limpiar datos demo si corresponde
   logout: (req, res) => {
     // Si es usuario demo, limpio sus datos temporales
-    if (req.session.usuario && DEMO_EMAILS.includes(req.session.usuario.email.toLowerCase())) {
-      cleanupDemoData(req.session.usuario.id);
+    if (req.session.usuario && EMAILS_DEMO.includes((req.session.usuario.email || '').toLowerCase())) {
+      limpiarDatosDemo(req.session.usuario.id);
       console.log(`🧹 Datos demo limpiados para usuario: ${req.session.usuario.email}`);
     }
     

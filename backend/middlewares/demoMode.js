@@ -13,14 +13,14 @@ const EMAILS_DEMO = [
 // Middleware para identificar si es un usuario demo
 const modoDemo = (req, res, next) => {
   // Verifico si el usuario está logueado y es un usuario demo
-  if (req.session.user && EMAILS_DEMO.includes(req.session.user.email.toLowerCase())) {
+  if (req.session.usuario && EMAILS_DEMO.includes((req.session.usuario.email || '').toLowerCase())) {
     req.esUsuarioDemo = true;
-    req.idUsuarioDemo = req.session.user.id;
+    req.idUsuarioDemo = req.session.usuario.id;
     
     // Agrego header para que el frontend sepa que está en modo demo
     res.set('X-Demo-Mode', 'true');
     
-    console.log(`🎭 Usuario demo detectado: ${req.session.user.email}`);
+  console.log(`🎭 Usuario demo detectado: ${req.session.usuario.email}`);
   } else {
     req.esUsuarioDemo = false;
   }
