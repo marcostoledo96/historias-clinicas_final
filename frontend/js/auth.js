@@ -85,12 +85,12 @@ function actualizarInfoUsuario(usuario) {
     usuarioNombre.textContent = usuario.nombre || 'Usuario';
   }
   // * Actualizar etiqueta visible del botón de usuario (nuevo diseño: nombre + chevron)
-  const userMenuLabel = document.getElementById('usuario-menu-label');
+  const userMenuLabel = document.getElementById('usuario-menu-label') || document.getElementById('user-menu-label');
   if (userMenuLabel && usuario) {
     userMenuLabel.textContent = usuario.nombre || 'Usuario';
   }
   // * Iniciales para vista responsive (móvil)
-  const initialsEl = document.getElementById('usuario-menu-initials');
+  const initialsEl = document.getElementById('usuario-menu-initials') || document.getElementById('user-menu-initials');
   const getInitials = (nombreCompleto, email) => {
     const norm = (s) => String(s || '').trim();
     const n = norm(nombreCompleto);
@@ -118,7 +118,7 @@ function actualizarInfoUsuario(usuario) {
     if (avatar && usuario) {
       avatar.textContent = getInitials(usuario.nombre, usuario.email);
     }
-    const btn = document.getElementById('usuario-menu-boton');
+  const btn = document.getElementById('usuario-menu-boton') || document.getElementById('user-menu-button');
     if (btn && usuario?.nombre) btn.setAttribute('title', `Menú de ${usuario.nombre}`);
   } catch {}
 }

@@ -54,7 +54,9 @@ const controladorAutenticacion = {
             console.error('Error guardando sesión:', err2);
             return res.status(500).json({ error: 'Error iniciando sesión' });
           }
-
+          try {
+            console.log(`[login] sid=${req.sessionID} usuario=${req.session.usuario?.email}`);
+          } catch {}
           res.json({
             mensaje: 'Login exitoso',
             usuario: {
