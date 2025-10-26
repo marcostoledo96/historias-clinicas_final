@@ -46,13 +46,8 @@ const controladorAutenticacion = {
         };
 
         // Si el usuario eligió "mantener sesión iniciada", extender duración de cookie (30 días)
-        if (remember) {
-          const dias30 = 30 * 24 * 60 * 60 * 1000;
-          req.session.cookie.maxAge = dias30;
-        } else {
-          // Cookie de sesión (hasta cerrar navegador)
-          req.session.cookie.expires = false;
-        }
+        const unDia = 24 * 60 * 60 * 1000;
+        req.session.cookie.maxAge = remember ? (30 * unDia) : unDia;
 
         req.session.save((err2) => {
           if (err2) {
@@ -98,6 +93,12 @@ const controladorAutenticacion = {
   // GET /api/auth/verificar
   // * Verificar sesión: devuelve autenticado=true/false y datos mínimos
   verificarSesion: (req, res) => {
+    try {
+      const sid = req.sessionID;
+      const tieneUsuario = !!req.session.usuario;
+      const email = req.session.usuario?.email;
+      console.log(`[verificarSesion] sid=${sid} usuario=${tieneUsuario ? email : 'N/A'}`);
+    } catch {}
     if (req.session.usuario) {
       res.json({ 
         autenticado: true, 

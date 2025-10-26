@@ -65,7 +65,9 @@ app.use(session({
   store: new PgSession({
     pool,
     tableName: 'session',
-    createTableIfMissing: true
+    createTableIfMissing: true,
+    // TTL por defecto para sesiones sin "remember": 24 horas
+    ttl: 24 * 60 * 60
   }),
   secret: process.env.SESSION_SECRET || 'historias_clinicas_secret',
   resave: false,
