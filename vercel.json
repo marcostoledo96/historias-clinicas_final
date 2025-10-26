@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/server.js",
+      "src": "api/index.js",
       "use": "@vercel/node",
       "config": {
         "maxLambdaSize": "50mb"
@@ -12,7 +12,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/server.js"
+      "dest": "api/index.js"
     },
     {
       "src": "/(.*\\.(js|css|html|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
@@ -23,11 +23,20 @@
       "dest": "frontend/index.html"
     },
     {
+      "src": "/(inicio|consultas|pacientes|turnos|configuracion|consulta|registro|recuperar|paciente_crear|perfil_paciente|turno_nuevo|turno_editar)\\.html",
+      "dest": "frontend/$1.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "frontend/$1"
     }
   ],
   "env": {
     "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30
+    }
   }
 }

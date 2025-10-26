@@ -70,11 +70,29 @@ const pacientesRoutes = require('./routes/pacientes');
 const consultasRoutes = require('./routes/consultas');
 const turnosRoutes = require('./routes/turnos');
 
+// Middleware de logging específico para Vercel
+if (process.env.VERCEL) {
+  app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - Usuario: ${req.session?.usuario?.email || 'anónimo'}`);
+    next();
+  });
+}
+
 // Uso las rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/consultas', consultasRoutes);
 app.use('/api/turnos', turnosRoutes);
+
+// Ruta de salud para diagnóstico
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV,
+    vercel: !!process.env.VERCEL
+  });
+});
 
 // * Ruta raíz: entrega Inicio (la página maneja redirecciones si falta sesión)
 app.get('/', (req, res) => {
