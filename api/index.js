@@ -1,5 +1,5 @@
 // Punto de entrada para Vercel
-// Este archivo configura y exporta la aplicación Express
+// Este archivo configura y exporta la aplicación Express como función serverless
 
 const path = require('path');
 
@@ -11,34 +11,48 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 const rootDir = path.join(__dirname, '..');
 process.chdir(rootDir);
 
+// Log para debugging en Vercel
+console.log('Vercel function starting...');
+console.log('Working directory:', process.cwd());
+console.log('__dirname:', __dirname);
+console.log('Root directory:', rootDir);
+
+let handler;
+
 try {
-  // Importar dotenv explícitamente
+  // Configurar dotenv explícitamente
+  console.log('Loading environment variables...');
   require('dotenv').config({ path: path.join(rootDir, 'backend', '.env') });
   
+  console.log('Environment loaded:', {
+    NODE_ENV: process.env.NODE_ENV,
+    hasDBUrl: !!process.env.DATABASE_URL,
+    hasSessionSecret: !!process.env.SESSION_SECRET
+  });
+  
   // Importar la aplicación
+  console.log('Loading Express app...');
   const app = require('../backend/server.js');
+  console.log('Express app loaded successfully');
   
-  // Manejar errores no capturados específicamente para Vercel
-  process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  });
-  
-  process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
-  });
-  
-  module.exports = app;
+  // Crear el handler para Vercel
+  handler = (req, res) => {
+    console.log(`${req.method} ${req.url}`);
+    return app(req, res);
+  };
   
 } catch (error) {
-  console.error('Error initializing app:', error);
+  console.error('Error initializing Vercel function:', error);
+  console.error('Error stack:', error.stack);
   
-  // Crear una aplicación mínima de respaldo
+  // Crear handler de fallback
   const express = require('express');
-  const app = express();
+  const fallbackApp = express();
   
-  app.use(express.json());
+  fallbackApp.use(express.json());
   
-  app.all('*', (req, res) => {
+  fallbackApp.all('*', (req, res) => {
+    console.error('Fallback handler for:', req.method, req.url);
     res.status(500).json({ 
       error: 'Server initialization failed', 
       details: error.message,
@@ -46,5 +60,8 @@ try {
     });
   });
   
-  module.exports = app;
+  handler = fallbackApp;
 }
+
+// Exportar el handler para Vercel
+module.exports = handler;
