@@ -18,7 +18,8 @@ const allowedOrigins = [
   'http://localhost:3000', 
   'http://127.0.0.1:5500',
   process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
-  process.env.VERCEL_BRANCH_URL && `https://${process.env.VERCEL_BRANCH_URL}`
+  process.env.VERCEL_BRANCH_URL && `https://${process.env.VERCEL_BRANCH_URL}`,
+  'https://historias-clinicas-final.vercel.app' // Agregar tu dominio específico
 ].filter(Boolean);
 
 app.use(cors({
@@ -27,11 +28,12 @@ app.use(cors({
     if (!origin) return callback(null, true);
     
     // Permito cualquier subdominio de vercel.app para la demo
-    if (origin.includes('.vercel.app')) return callback(null, true);
+    if (origin && origin.includes('.vercel.app')) return callback(null, true);
     
     // Verifico origins específicos
     if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
     
+    console.log('CORS blocked origin:', origin);
     callback(new Error('No permitido por CORS'));
   },
   credentials: true

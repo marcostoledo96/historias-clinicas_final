@@ -116,7 +116,7 @@
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
-                        'contenido-Type': 'application/json'
+                        'Content-Type': 'application/json'
                     },
                     credentials: 'include',
                     body: JSON.stringify(loginData)
