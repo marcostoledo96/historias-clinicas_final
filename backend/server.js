@@ -15,28 +15,36 @@ const PORT = process.env.PORT || 3000;
 // Middlewares
 // CORS: permito cookies/sesiones desde el frontend y Vercel
 const allowedOrigins = [
-  'http://localhost:3000', 
+  // Desarrollo local
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
   'http://127.0.0.1:5500',
+  // Entornos Vercel
   process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
   process.env.VERCEL_BRANCH_URL && `https://${process.env.VERCEL_BRANCH_URL}`,
-  'https://historias-clinicas-final.vercel.app' // Agregar tu dominio específico
+  // Dominio específico de producción (ajusta según tu despliegue)
+  'https://historias-clinicas-final.vercel.app'
 ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
     // Permito requests sin origin (aplicaciones móviles, Postman, etc.)
     if (!origin) return callback(null, true);
-    
+
     // Permito cualquier subdominio de vercel.app para la demo
     if (origin && origin.includes('.vercel.app')) return callback(null, true);
-    
+
     // Verifico origins específicos
-    if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
-    
-    console.log('CORS blocked origin:', origin);
-    callback(new Error('No permitido por CORS'));
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    console.warn('CORS bloqueó el origen:', origin);
+    // No lanzamos error para no romper el servidor; simplemente no habilitamos CORS
+    return callback(null, false);
   },
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 204
 }));
 
 // Body parsers para JSON y formularios
@@ -95,9 +103,10 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
-// Iniciar el servidor sólo fuera de entorno de test
-// * Iniciar el servidor (evitado en tests)
-if (process.env.NODE_ENV !== 'test') {
+// Iniciar el servidor sólo en entornos no serverless
+// - Evitamos hacer app.listen() en Vercel (funciones serverless)
+// - También evitamos en tests
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   const MAX_REINTENTOS = 5;
 
   const iniciar = (puerto, intentosRestantes) => {
