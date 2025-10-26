@@ -1,13 +1,12 @@
 const bcrypt = require('bcrypt');
 const Usuario = require('../models/Usuario');
-const { limpiarDatosDemo, EMAILS_DEMO } = require('../middlewares/demoMode');
 
-// Controlador de autenticación y perfil
-// Manejo login/logout, registro de usuarios y recuperación de contraseñas para demo
-// Para la recuperación uso memoria temporal (no persisto en BD, es solo para mostrar funcionalidad)
+// Controlador: Autenticación / Perfil
+// Maneja login/logout, registro (admin), verificación y perfil + recuperación demo
+// Almacenamiento en memoria de códigos de recuperación (solo demo; no persistente)
 const codigosRecuperacion = new Map(); // email -> { codigo, expira }
 
-const controladorAutenticacion = {
+const authController = {
   // POST /api/auth/login
   // * Iniciar sesión: valida credenciales, crea sesión y soporta "Recordarme"
   login: async (req, res) => {
@@ -30,43 +29,32 @@ const controladorAutenticacion = {
         return res.status(401).json({ error: 'Credenciales inválidas' });
       }
 
-      // Regenerar sesión para seguridad y asegurar persistencia antes de responder
-      req.session.regenerate((err) => {
-        if (err) {
-          console.error('Error regenerando sesión:', err);
-          return res.status(500).json({ error: 'Error iniciando sesión' });
-        }
+      // Crear sesión
+      req.session.usuarioId = usuario.id_usuario;
+      req.session.usuario = {
+        id: usuario.id_usuario,
+        email: usuario.email,
+        nombre: usuario.nombre_completo,
+        rol: usuario.rol
+      };
 
-        req.session.usuarioId = usuario.id_usuario;
-        req.session.usuario = {
+      // Si el usuario eligió "mantener sesión iniciada", extender duración de cookie (30 días)
+      if (remember) {
+        const dias30 = 30 * 24 * 60 * 60 * 1000;
+        req.session.cookie.maxAge = dias30;
+      } else {
+        // Cookie de sesión (hasta cerrar navegador)
+        req.session.cookie.expires = false;
+      }
+
+      res.json({
+        mensaje: 'Login exitoso',
+        usuario: {
           id: usuario.id_usuario,
           email: usuario.email,
           nombre: usuario.nombre_completo,
           rol: usuario.rol
-        };
-
-        // Si el usuario eligió "mantener sesión iniciada", extender duración de cookie (30 días)
-        const unDia = 24 * 60 * 60 * 1000;
-        req.session.cookie.maxAge = remember ? (30 * unDia) : unDia;
-
-        req.session.save((err2) => {
-          if (err2) {
-            console.error('Error guardando sesión:', err2);
-            return res.status(500).json({ error: 'Error iniciando sesión' });
-          }
-          try {
-            console.log(`[login] sid=${req.sessionID} usuario=${req.session.usuario?.email}`);
-          } catch {}
-          res.json({
-            mensaje: 'Login exitoso',
-            usuario: {
-              id: usuario.id_usuario,
-              email: usuario.email,
-              nombre: usuario.nombre_completo,
-              rol: usuario.rol
-            }
-          });
-        });
+        }
       });
 
     } catch (error) {
@@ -77,12 +65,6 @@ const controladorAutenticacion = {
 
   // Cerrar sesión y limpiar datos demo si corresponde
   logout: (req, res) => {
-    // Si es usuario demo, limpio sus datos temporales
-    if (req.session.usuario && EMAILS_DEMO.includes((req.session.usuario.email || '').toLowerCase())) {
-      limpiarDatosDemo(req.session.usuario.id);
-      console.log(`🧹 Datos demo limpiados para usuario: ${req.session.usuario.email}`);
-    }
-    
     req.session.destroy((err) => {
       if (err) {
         return res.status(500).json({ error: 'Error al cerrar sesión' });
@@ -95,12 +77,6 @@ const controladorAutenticacion = {
   // GET /api/auth/verificar
   // * Verificar sesión: devuelve autenticado=true/false y datos mínimos
   verificarSesion: (req, res) => {
-    try {
-      const sid = req.sessionID;
-      const tieneUsuario = !!req.session.usuario;
-      const email = req.session.usuario?.email;
-      console.log(`[verificarSesion] sid=${sid} usuario=${tieneUsuario ? email : 'N/A'}`);
-    } catch {}
     if (req.session.usuario) {
       res.json({ 
         autenticado: true, 
@@ -256,4 +232,4 @@ controladorAutenticacion.cambiarPassword = async (req, res) => {
   }
 };
 
-module.exports = controladorAutenticacion;
+module.exports = authController;

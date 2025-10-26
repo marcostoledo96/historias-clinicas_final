@@ -18,42 +18,17 @@ if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
 
+// Detrás de proxies (Vercel/Heroku/NGINX) necesitamos confiar en el proxy
+// para que express-session pueda marcar la cookie como Secure correctamente
+if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Middlewares
-// CORS: permito cookies/sesiones desde el frontend y Vercel
-const allowedOrigins = [
-  // Desarrollo local
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://127.0.0.1:3000',
-  'http://127.0.0.1:3001',
-  'http://127.0.0.1:5500',
-  // Entornos Vercel
-  process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
-  process.env.VERCEL_BRANCH_URL && `https://${process.env.VERCEL_BRANCH_URL}`,
-  // Dominio específico de producción (ajusta según tu despliegue)
-  'https://historias-clinicas-final.vercel.app'
-].filter(Boolean);
-
+// CORS: permitir cookies/sesiones desde el frontend servido localmente
 app.use(cors({
-  origin: function (origin, callback) {
-    // Permito requests sin origin (aplicaciones móviles, Postman, etc.)
-    if (!origin) return callback(null, true);
-
-    // Permito cualquier subdominio de vercel.app para la demo
-    if (origin && origin.includes('.vercel.app')) return callback(null, true);
-
-    // Permito cualquier localhost o 127.0.0.1 con puerto dinámico en desarrollo
-    if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin)) return callback(null, true);
-
-    // Verifico origins específicos
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-
-  console.warn('CORS bloqueó el origen:', origin);
-    // No lanzamos error para no romper el servidor; simplemente no habilitamos CORS
-    return callback(null, false);
-  },
-  credentials: true,
-  optionsSuccessStatus: 204
+  origin: ['http://localhost:3000', 'http://127.0.0.1:5500'],
+  credentials: true
 }));
 
 // Body parsers para JSON y formularios
@@ -61,36 +36,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Configuración de sesiones
-// En serverless la memoria se pierde entre invocaciones, por eso usamos PostgreSQL como store
-const pool = require('./db/connection');
-const PgSession = require('connect-pg-simple')(session);
+// Uso sesiones en memoria (en producción sería mejor un store persistente)
 app.use(session({
-  store: new PgSession({
-    pool,
-    tableName: 'session',
-    createTableIfMissing: true,
-    // TTL por defecto para sesiones sin "remember": 24 horas
-    ttl: 24 * 60 * 60
-  }),
   secret: process.env.SESSION_SECRET || 'historias_clinicas_secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    // 'auto' usa Secure sólo si la request llega por HTTPS (ideal para Vercel) y permite HTTP en local
-    secure: 'auto',
-    maxAge: 24 * 60 * 60 * 1000, // 24 horas (se ajusta si remember=true)
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    path: '/'
+    secure: false, // true en producción con HTTPS
+    maxAge: 24 * 60 * 60 * 1000 // 24 horas
   }
 }));
 
 // Sirvo archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
-
-// Middleware para modo demo
-const { modoDemo, interceptarOperacionesDemo } = require('./middlewares/demoMode');
-app.use(modoDemo);
-app.use(interceptarOperacionesDemo);
 
 // Importo y monto las rutas de la API
 const authRoutes = require('./routes/auth');
@@ -123,10 +81,9 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
-// Iniciar el servidor sólo en entornos no serverless
-// - Evitamos hacer app.listen() en Vercel (funciones serverless)
-// - También evitamos en tests
-if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+// Iniciar el servidor sólo fuera de entorno de test
+// Iniciar el servidor (evitado en tests)
+if (process.env.NODE_ENV !== 'test') {
   const MAX_REINTENTOS = 5;
 
   const iniciar = (puerto, intentosRestantes) => {
