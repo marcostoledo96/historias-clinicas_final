@@ -2,7 +2,7 @@ const Consulta = require('../models/Consulta');
 
 // ! Controlador: Consultas
 // ? Maneja la lógica de negocio para CRUD de consultas
-const consultasController = {
+const controladorConsultas = {
   // GET /api/consultas
   // * Lista consultas (todas, o filtradas por fecha/paciente vía query)
   obtenerConsultas: async (req, res) => {
@@ -172,4 +172,4 @@ const consultasController = {
   }
 };
 
-module.exports = consultasController;
+module.exports = controladorConsultas;

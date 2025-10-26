@@ -8,50 +8,50 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" contenido="width=device-width, initial-scale=1.0" />
   <title>Turnos - Sistema de Historias Clínicas</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <div class="main-layout">
-    <div id="header-container"></div>
+  <div class="diseno-principal">
+    <div id="encabezado-container"></div>
 
-    <main class="content">
+    <main class="contenido">
       <div id="alert-container"></div>
 
       <div class="card">
-        <div class="card-header">
-          <h2 class="card-title page-title"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span> Turnos</h2>
+        <div class="card-encabezado">
+          <h2 class="card-title titulo-pagina"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span> Turnos</h2>
         </div>
         <div class="card-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="dia">Día</label>
+          <div class="fila-formulario">
+            <div class="grupo-formulario">
+              <label class="etiqueta-formulario" for="dia">Día</label>
               <div class="flex gap-2 items-center">
-                <button id="btn-dia-anterior" class="btn btn-field" title="Ver día anterior"><span class="material-symbols-outlined" aria-hidden="true">chevron_left</span></button>
+                <button id="boton-dia-anterior" class="boton boton-field" title="Ver día anterior"><span class="material-symbols-outlined" aria-hidden="true">chevron_left</span></button>
                 <input id="dia" type="date" class="form-input" />
-                <button id="btn-dia-siguiente" class="btn btn-field" title="Ver día siguiente"><span class="material-symbols-outlined" aria-hidden="true">chevron_right</span></button>
+                <button id="boton-dia-siguiente" class="boton boton-field" title="Ver día siguiente"><span class="material-symbols-outlined" aria-hidden="true">chevron_right</span></button>
               </div>
               <small class="text-muted">Cambia la fecha para ver los turnos de otros días.</small>
             </div>
-            <div class="form-group">
-              <label class="form-label">Ver</label>
+            <div class="grupo-formulario">
+              <label class="etiqueta-formulario">Ver</label>
               <div class="flex flex-wrap gap-4 gap-sm-2">
-                <button id="btn-ver-hoy" class="btn btn-primary btn-field">Hoy</button>
-                <button id="btn-ver-dia" class="btn btn-secondary btn-field">Aplicar fecha</button>
+                <button id="boton-ver-hoy" class="boton boton-primario boton-field">Hoy</button>
+                <button id="boton-ver-dia" class="boton boton-secundario boton-field">Aplicar fecha</button>
               </div>
             </div>
-            <div class="form-group">
-              <label class="form-label" for="paciente-filtro">Nombre o Apellido</label>
+            <div class="grupo-formulario">
+              <label class="etiqueta-formulario" for="paciente-filtro">Nombre o Apellido</label>
               <div class="flex gap-4">
                 <input id="paciente-filtro" type="text" class="form-input" placeholder="Ej: Juan o Pérez" />
-                <button id="btn-filtrar-paciente" class="btn btn-field">Filtrar</button>
+                <button id="boton-filtrar-paciente" class="boton boton-field">Filtrar</button>
               </div>
             </div>
-            <div class="form-group">
-              <label class="form-label">Acciones</label>
+            <div class="grupo-formulario">
+              <label class="etiqueta-formulario">Acciones</label>
               <div class="flex flex-wrap gap-4 gap-sm-2">
-                <button id="btn-nuevo-turno" class="btn btn-success btn-field"><span class="material-symbols-outlined" aria-hidden="true">add</span> Nuevo Turno</button>
+                <button id="boton-nuevo-turno" class="boton boton-exito boton-field"><span class="material-symbols-outlined" aria-hidden="true">add</span> Nuevo Turno</button>
               </div>
             </div>
           </div>
@@ -90,21 +90,21 @@
 
   <!-- Formulario inline de nuevo turno deshabilitado: ahora se usa una ventana nueva (turno_nuevo.html) -->
   <div id="card-nuevo-turno" class="card mt-4 hidden" style="display:none;">
-        <div class="card-header">
+        <div class="card-encabezado">
           <h3 class="card-title"><span class="material-symbols-outlined" aria-hidden="true">add</span> Nuevo Turno</h3>
         </div>
         <div class="card-body">
           <form id="form-nuevo-turno">
             <!-- Fila 1: Paciente con autocompletado -->
-            <div class="form-row">
-              <div class="form-group w-full relative">
-                <label class="form-label">Paciente</label>
+            <div class="fila-formulario">
+              <div class="grupo-formulario w-full relative">
+                <label class="etiqueta-formulario">Paciente</label>
                 <div class="flex gap-4 items-center">
                   <div class="w-full relative">
                     <input id="paciente-input" class="form-input" placeholder="Nombre o apellido del paciente..." autocomplete="off" />
                     <div id="paciente-sugerencias" class="hidden suggestion-panel"></div>
                   </div>
-                  <button type="button" id="btn-seleccionar-paciente-turno" class="btn btn-field">Seleccionar</button>
+                  <button type="button" id="boton-seleccionar-paciente-turno" class="boton boton-field">Seleccionar</button>
                 </div>
                 <input name="id_paciente" type="hidden" required />
                 <div class="text-sm mt-1">Escribe para ver sugerencias y elige; o usa "Seleccionar". Si no existe, se creará automáticamente al guardar el turno.</div>
@@ -112,42 +112,42 @@
             </div>
 
             <!-- Fila 2: Cobertura, Día, Hora -->
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Cobertura</label>
+            <div class="fila-formulario">
+              <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Cobertura</label>
                 <input name="cobertura" class="form-input" />
               </div>
-              <div class="form-group">
-                <label class="form-label">Día</label>
+              <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Día</label>
                 <input name="dia" type="date" class="form-input" required />
               </div>
-              <div class="form-group">
-                <label class="form-label">Horario</label>
+              <div class="grupo-formulario">
+                <label class="etiqueta-formulario">Horario</label>
                 <input name="horario" type="time" class="form-input" required />
               </div>
             </div>
 
             <!-- Fila 3: Detalle grande y 1ra vez -->
-            <div class="form-row">
-              <div class="form-group w-full">
-                <label class="form-label">Detalle</label>
+            <div class="fila-formulario">
+              <div class="grupo-formulario w-full">
+                <label class="etiqueta-formulario">Detalle</label>
                 <textarea name="detalle" class="form-input" rows="5" placeholder="Notas del turno, motivo, etc."></textarea>
               </div>
-              <div class="form-group login-remember">
-                <label class="form-label" for="primera_vez">1ra vez</label>
+              <div class="grupo-formulario login-remember">
+                <label class="etiqueta-formulario" for="primera_vez">1ra vez</label>
                 <input id="primera_vez" name="primera_vez" type="checkbox" />
               </div>
             </div>
-            <div class="card-footer">
-              <button type="button" id="btn-cancelar-turno" class="btn btn-secondary btn-field">Cancelar</button>
-              <button type="submit" id="btn-guardar-turno" class="btn btn-primary btn-field">Guardar</button>
+            <div class="card-pie-pagina">
+              <button type="button" id="boton-cancelar-turno" class="boton boton-secundario boton-field">Cancelar</button>
+              <button type="submit" id="boton-guardar-turno" class="boton boton-primario boton-field">Guardar</button>
             </div>
           </form>
         </div>
       </div>
     </main>
 
-    <div id="footer-container"></div>
+    <div id="pie-pagina-container"></div>
   </div>
 
   <script src="js/utils.js"></script>
@@ -157,3 +157,4 @@
   <script src="js/turnos.js"></script>
 </body>
 </html>
+

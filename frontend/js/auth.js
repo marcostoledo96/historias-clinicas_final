@@ -1,31 +1,33 @@
-// ! Autenticación (frontend)
-// * Este módulo expone utilidades comunes para páginas protegidas:
-//   - verificarAutenticacion: consulta al backend si hay sesión activa
-//   - cerrarSesion: cierra la sesión y redirige a login
-//   - verificarAcceso: middleware de páginas protegidas; redirige a login si no hay sesión
-//   - actualizarInfoUsuario: refresca el nombre visible en el header
-//   - configurarLogout: ata el botón de cerrar sesión del header
-//   - registrarUsuario: alta de usuario (sólo administradores)
-//   - inicializarPaginaProtegida: bootstrap común (auth + header + navegación activa)
-// ? Dependencias: utils.js (mostrarAlerta, manejarErrorAPI, confirmarAccion)
-// TODO: Unificar mensajes de error/success vía una capa central de notificaciones
+// Autenticación del frontend
+// Acá tengo las utilidades que uso en páginas protegidas:
+//   - verificarAutenticacion: consulto al backend si hay sesión activa
+//   - cerrarSesion: cierro la sesión y redirijo a login
+//   - verificarAcceso: middleware para páginas protegidas
+//   - actualizarInfoUsuario: refresco el nombre visible en el header
+//   - configurarLogout: conecto el botón de cerrar sesión del header
+//   - registrarUsuario: alta de usuario (solo administradores)
+//   - inicializarPaginaProtegida: bootstrap común
 
 // Verificar si el usuario está autenticado
 async function verificarAutenticacion() {
   try {
-    const response = await fetch('/api/auth/verificar', {
+    const respuesta = await fetch('/api/auth/verificar', {
       method: 'GET',
       credentials: 'include'
     });
     
-    if (response.ok) {
-      const data = await response.json();
-      return data;
+    if (respuesta.ok) {
+      const datos = await respuesta.json();
+      
+      // Intercepto respuesta para detectar modo demo
+      interceptarRespuestaAPI(respuesta, datos);
+      
+      return datos;
     }
     
     return { autenticado: false };
   } catch (error) {
-    console.error('Error verificando autenticación:', error);
+    console.error('error verificando autenticación:', error);
     return { autenticado: false };
   }
 }
@@ -33,23 +35,26 @@ async function verificarAutenticacion() {
 // Cerrar sesión
 async function cerrarSesion() {
   try {
-    const response = await fetch('/api/auth/logout', {
+    // Oculto banner demo si existe
+    ocultarBannerDemo();
+    
+    const respuesta = await fetch('/api/auth/logout', {
       method: 'POST',
       credentials: 'include'
     });
     
-    if (response.ok) {
-      // * UX: feedback + pequeña espera para que el usuario lo perciba
+    if (respuesta.ok) {
+      // Muestro feedback y espero un poco para que el usuario lo vea
       mostrarAlerta('Sesión cerrada exitosamente', 'success');
       setTimeout(() => {
         window.location.href = 'index.html';
       }, 1000);
     } else {
-      mostrarAlerta('Error al cerrar sesión', 'error');
+      mostrarAlerta('error al cerrar sesión', 'error');
     }
   } catch (error) {
-    console.error('Error cerrando sesión:', error);
-    mostrarAlerta('Error de conexión', 'error');
+    console.error('error cerrando sesión:', error);
+    mostrarAlerta('error de conexión', 'error');
   }
 }
 
@@ -80,12 +85,12 @@ function actualizarInfoUsuario(usuario) {
     usuarioNombre.textContent = usuario.nombre || 'Usuario';
   }
   // * Actualizar etiqueta visible del botón de usuario (nuevo diseño: nombre + chevron)
-  const userMenuLabel = document.getElementById('user-menu-label');
+  const userMenuLabel = document.getElementById('usuario-menu-label');
   if (userMenuLabel && usuario) {
     userMenuLabel.textContent = usuario.nombre || 'Usuario';
   }
   // * Iniciales para vista responsive (móvil)
-  const initialsEl = document.getElementById('user-menu-initials');
+  const initialsEl = document.getElementById('usuario-menu-initials');
   const getInitials = (nombreCompleto, email) => {
     const norm = (s) => String(s || '').trim();
     const n = norm(nombreCompleto);
@@ -113,12 +118,12 @@ function actualizarInfoUsuario(usuario) {
     if (avatar && usuario) {
       avatar.textContent = getInitials(usuario.nombre, usuario.email);
     }
-    const btn = document.getElementById('user-menu-button');
+    const btn = document.getElementById('usuario-menu-boton');
     if (btn && usuario?.nombre) btn.setAttribute('title', `Menú de ${usuario.nombre}`);
   } catch {}
 }
 
-// Configurar event listener para el botón de logout
+// Configurar evento listener para el botón de logout
 function configurarLogout() {
   const btnLogout = document.getElementById('btn-logout');
   if (btnLogout) {
@@ -135,7 +140,7 @@ function configurarLogout() {
 // Función para registrar nuevo usuario (solo admins)
 async function registrarUsuario(datosUsuario) {
   try {
-    const response = await fetch('/api/auth/registro', {
+    const respuesta = await fetch('/api/auth/registro', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -144,19 +149,19 @@ async function registrarUsuario(datosUsuario) {
       body: JSON.stringify(datosUsuario)
     });
     
-    const result = await response.json();
+    const result = await respuesta.json();
     
-    if (response.ok) {
+    if (respuesta.ok) {
       mostrarAlerta(result.mensaje || 'Usuario registrado exitosamente', 'success');
-      return { exito: true, data: result };
+      return { exito: true, datos: result };
     } else {
-      mostrarAlerta(result.error || 'Error al registrar usuario', 'error');
+      mostrarAlerta(result.error || 'error al registrar usuario', 'error');
       return { exito: false, error: result.error };
     }
   } catch (error) {
-    console.error('Error registrando usuario:', error);
+    console.error('error registrando usuario:', error);
     manejarErrorAPI(error);
-    return { exito: false, error: 'Error de conexión' };
+    return { exito: false, error: 'error de conexión' };
   }
 }
 
@@ -190,3 +195,4 @@ function marcarEnlaceActivo() {
     }
   });
 }
+

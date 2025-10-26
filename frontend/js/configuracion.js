@@ -1,9 +1,9 @@
-// ! Configuración de cuenta (perfil, contraseña y preferencias locales)
-// * Contrato rápido:
+// Configuración de cuenta (perfil, contraseña y preferencias locales)
+// Lo que manejo aquí:
 //   - GET/PUT /api/auth/perfil para datos del usuario
 //   - PUT /api/auth/password para cambio de contraseña
 //   - Preferencias se guardan en localStorage por ahora (tema, auto_inicio, page_size)
-// ? Requiere: inicializarPagina() desde components.js, y utils para UI (mostrarAlerta, setButtonLoading, manejarErrorAPI)
+// Necesito: inicializarPagina() desde components.js, y utils para UI
 
 document.addEventListener('DOMContentLoaded', async () => {
   const acceso = await inicializarPagina();
@@ -88,3 +88,4 @@ function configurarFormularios() {
     if (prefs.page_size) document.querySelector('#form-preferencias [name="page_size"]').value = String(prefs.page_size);
   } catch {}
 }
+

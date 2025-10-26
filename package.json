@@ -1,0 +1,13 @@
+{
+  "name": "historias-clinicas-demo",
+  "version": "1.0.0",
+  "description": "Sistema de Historias Clínicas que desarrollé - Demo en Vercel",
+  "private": true,
+  "scripts": {
+    "build": "cd backend && npm install && npm run build",
+    "start": "cd backend && npm start"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

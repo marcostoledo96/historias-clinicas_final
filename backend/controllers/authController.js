@@ -1,12 +1,13 @@
 const bcrypt = require('bcrypt');
 const Usuario = require('../models/Usuario');
+const { cleanupDemoData, DEMO_EMAILS } = require('../middlewares/demoMode');
 
-// ! Controlador: Autenticación / Perfil
-// ? Maneja login/logout, registro (admin), verificación y perfil + recuperación demo
-// Almacenamiento en memoria de códigos de recuperación (solo demo; no persistente)
+// Controlador de autenticación y perfil
+// Manejo login/logout, registro de usuarios y recuperación de contraseñas para demo
+// Para la recuperación uso memoria temporal (no persisto en BD, es solo para mostrar funcionalidad)
 const codigosRecuperacion = new Map(); // email -> { codigo, expira }
 
-const authController = {
+const controladorAutenticacion = {
   // POST /api/auth/login
   // * Iniciar sesión: valida credenciales, crea sesión y soporta "Recordarme"
   login: async (req, res) => {
@@ -63,9 +64,14 @@ const authController = {
     }
   },
 
-  // POST /api/auth/logout
-  // * Cerrar sesión: destruye la sesión y borra cookie
+  // Cerrar sesión y limpiar datos demo si corresponde
   logout: (req, res) => {
+    // Si es usuario demo, limpio sus datos temporales
+    if (req.session.usuario && DEMO_EMAILS.includes(req.session.usuario.email.toLowerCase())) {
+      cleanupDemoData(req.session.usuario.id);
+      console.log(`🧹 Datos demo limpiados para usuario: ${req.session.usuario.email}`);
+    }
+    
     req.session.destroy((err) => {
       if (err) {
         return res.status(500).json({ error: 'Error al cerrar sesión' });
@@ -129,7 +135,7 @@ const authController = {
 };
 
 // Solicitar recuperación: genera un código de 6 dígitos y lo "envía" (log)
-authController.solicitarRecuperacion = async (req, res) => {
+controladorAutenticacion.solicitarRecuperacion = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email requerido' });
@@ -149,7 +155,7 @@ authController.solicitarRecuperacion = async (req, res) => {
 };
 
 // Restablecer contraseña con código
-authController.restablecerConCodigo = async (req, res) => {
+controladorAutenticacion.restablecerConCodigo = async (req, res) => {
   try {
     const { email, codigo, password } = req.body;
     if (!email || !codigo || !password) return res.status(400).json({ error: 'Campos requeridos' });
@@ -174,9 +180,9 @@ authController.restablecerConCodigo = async (req, res) => {
   }
 };
 
-module.exports = authController;
+module.exports = controladorAutenticacion;
 // Nuevos endpoints de perfil
-authController.obtenerPerfil = async (req, res) => {
+controladorAutenticacion.obtenerPerfil = async (req, res) => {
   try {
     const id = req.session.usuario?.id;
     if (!id) return res.status(401).json({ error: 'No autenticado' });
@@ -190,7 +196,7 @@ authController.obtenerPerfil = async (req, res) => {
   }
 };
 
-authController.actualizarPerfil = async (req, res) => {
+controladorAutenticacion.actualizarPerfil = async (req, res) => {
   try {
     const id = req.session.usuario?.id;
     if (!id) return res.status(401).json({ error: 'No autenticado' });
@@ -212,7 +218,7 @@ authController.actualizarPerfil = async (req, res) => {
   }
 };
 
-authController.cambiarPassword = async (req, res) => {
+controladorAutenticacion.cambiarPassword = async (req, res) => {
   try {
     const id = req.session.usuario?.id;
     if (!id) return res.status(401).json({ error: 'No autenticado' });
@@ -232,3 +238,5 @@ authController.cambiarPassword = async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 };
+
+module.exports = controladorAutenticacion;

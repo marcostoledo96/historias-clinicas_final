@@ -1,11 +1,10 @@
-// ! Componentes reutilizables (header/footer + helpers de UI)
-// * Este módulo carga fragmentos HTML comunes (header/footer) y configura:
+// Componentes reutilizables (header/footer + helpers de UI)
+// Este módulo carga fragmentos HTML comunes (header/footer) y configura:
 //   - Menú de usuario accesible (click fuera/Escape cierran)
 //   - Toggle de tema persistente en localStorage
 //   - Menú de navegación responsive
 //   - Heurísticas para reducir autofill/guardar contraseñas en inputs sensibles
-// ? Requerido por: todas las páginas con layout principal
-// TODO: incorporar lazy-loading del footer si pesa o tiene recursos costosos
+// Lo uso en todas las páginas con layout principal
 
 // Cargar header en la página
 async function cargarHeader() {

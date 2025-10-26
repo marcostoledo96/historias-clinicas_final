@@ -64,7 +64,7 @@ async function cargarEstadisticas() {
         }
         
     } catch (error) {
-        console.error('Error cargando estadísticas:', error);
+        console.error('error cargando estadísticas:', error);
         manejarErrorAPI(error);
     }
 }
@@ -72,19 +72,19 @@ async function cargarEstadisticas() {
 // * cargarTurnosHoy(): obtiene turnos del día y los muestra en la tabla
 async function cargarTurnosHoy() {
     try {
-        const response = await fetch('/api/turnos/hoy', {
+        const respuesta = await fetch('/api/turnos/hoy', {
             credentials: 'include'
         });
         
-        if (response.ok) {
-            turnosHoy = await response.json();
+        if (respuesta.ok) {
+            turnosHoy = await respuesta.json();
             mostrarTurnos(turnosHoy);
         } else {
-            manejarErrorAPI(null, response);
+            manejarErrorAPI(null, respuesta);
         }
         
     } catch (error) {
-        console.error('Error cargando turnos:', error);
+        console.error('error cargando turnos:', error);
         manejarErrorAPI(error);
     } finally {
         ocultarElemento('loading-turnos');
@@ -115,9 +115,9 @@ function mostrarTurnos(turnos) {
             <td>${turno.primera_vez ? '✅ Sí' : '-'}</td>
             <td>
                 <div class="flex gap-2">
-                    <button onclick="verPaciente(${turno.id_paciente})" class="btn btn-sm btn-primary">
+                    <boton onclick="verPaciente(${turno.id_paciente})" class="btn btn-sm btn-primary">
                         <span class="material-symbols-outlined" aria-hidden="true">visibility</span> Ver
-                    </button>
+                    </boton>
                 </div>
             </td>
         </tr>
@@ -127,7 +127,7 @@ function mostrarTurnos(turnos) {
 // * marcarLlegada(idTurno): setea situacion=en_espera con hora actual
 async function marcarLlegada(idTurno) {
     try {
-        const response = await fetch(`/api/turnos/${idTurno}/situacion`, {
+        const respuesta = await fetch(`/api/turnos/${idTurno}/situacion`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -139,17 +139,17 @@ async function marcarLlegada(idTurno) {
             })
         });
         
-        if (response.ok) {
+        if (respuesta.ok) {
             mostrarAlerta('Paciente marcado como llegado', 'success');
             await cargarTurnosHoy();
             await cargarEstadisticas();
         } else {
-            const error = await response.json();
-            mostrarAlerta(error.error || 'Error al marcar llegada', 'error');
+            const error = await respuesta.json();
+            mostrarAlerta(error.error || 'error al marcar llegada', 'error');
         }
         
     } catch (error) {
-        console.error('Error marcando llegada:', error);
+        console.error('error marcando llegada:', error);
         manejarErrorAPI(error);
     }
 }
@@ -157,7 +157,7 @@ async function marcarLlegada(idTurno) {
 // * marcarAtendido(idTurno)
 async function marcarAtendido(idTurno) {
     try {
-        const response = await fetch(`/api/turnos/${idTurno}/situacion`, {
+        const respuesta = await fetch(`/api/turnos/${idTurno}/situacion`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -168,17 +168,17 @@ async function marcarAtendido(idTurno) {
             })
         });
         
-        if (response.ok) {
+        if (respuesta.ok) {
             mostrarAlerta('Paciente marcado como atendido', 'success');
             await cargarTurnosHoy();
             await cargarEstadisticas();
         } else {
-            const error = await response.json();
-            mostrarAlerta(error.error || 'Error al marcar como atendido', 'error');
+            const error = await respuesta.json();
+            mostrarAlerta(error.error || 'error al marcar como atendido', 'error');
         }
         
     } catch (error) {
-        console.error('Error marcando como atendido:', error);
+        console.error('error marcando como atendido:', error);
         manejarErrorAPI(error);
     }
 }
@@ -243,18 +243,18 @@ async function realizarBusqueda() {
     }
     
     try {
-        const response = await fetch(`/api/pacientes?buscar=${encodeURIComponent(termino)}`, {
+        const respuesta = await fetch(`/api/pacientes?buscar=${encodeURIComponent(termino)}`, {
             credentials: 'include'
         });
         
-        if (response.ok) {
-            const pacientes = await response.json();
+        if (respuesta.ok) {
+            const pacientes = await respuesta.json();
             mostrarResultadosBusqueda(pacientes);
         }
         
     } catch (error) {
-        console.error('Error en búsqueda:', error);
-        resultadosContainer.innerHTML = '<p class="text-error">Error en la búsqueda</p>';
+        console.error('error en búsqueda:', error);
+        resultadosContainer.innerHTML = '<p class="text-error">error en la búsqueda</p>';
     }
 }
 
@@ -291,3 +291,4 @@ function seleccionarPaciente(idPaciente) {
     cerrarModalBusqueda();
     abrirPerfilPaciente(idPaciente);
 }
+

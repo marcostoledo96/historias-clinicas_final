@@ -2,7 +2,7 @@
 // ? Maneja login/logout, verificación de sesión, registro (admin) y perfil
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
+const controladorAutenticacion = require('../controllers/authController');
 const { logging, validarCamposRequeridos, verificarAuth, verificarAdmin } = require('../middlewares/auth');
 
 // * Logging básico para todas las rutas de este router
@@ -12,14 +12,14 @@ router.use(logging);
 //   Body requerido: { email, password }
 router.post('/login', 
   validarCamposRequeridos(['email', 'password']),
-  authController.login
+  controladorAutenticacion.login
 );
 
 // * POST /api/auth/logout
-router.post('/logout', authController.logout);
+router.post('/logout', controladorAutenticacion.logout);
 
 // * GET /api/auth/verificar
-router.get('/verificar', authController.verificarSesion);
+router.get('/verificar', controladorAutenticacion.verificarSesion);
 
 // * POST /api/auth/registro (solo admin)
 //   Body requerido: { email, nombre_completo, password }
@@ -27,16 +27,16 @@ router.post('/registro',
   verificarAuth,
   verificarAdmin,
   validarCamposRequeridos(['email', 'nombre_completo', 'password']),
-  authController.registro
+  controladorAutenticacion.registro
 );
 
 // * Recuperación de contraseña (flujo demo sin correo real)
-router.post('/recuperar', authController.solicitarRecuperacion);
-router.post('/restablecer', authController.restablecerConCodigo);
+router.post('/recuperar', controladorAutenticacion.solicitarRecuperacion);
+router.post('/restablecer', controladorAutenticacion.restablecerConCodigo);
 
 // * Perfil del usuario autenticado
-router.get('/perfil', verificarAuth, authController.obtenerPerfil);
-router.put('/perfil', verificarAuth, authController.actualizarPerfil);
-router.put('/password', verificarAuth, authController.cambiarPassword);
+router.get('/perfil', verificarAuth, controladorAutenticacion.obtenerPerfil);
+router.put('/perfil', verificarAuth, controladorAutenticacion.actualizarPerfil);
+router.put('/password', verificarAuth, controladorAutenticacion.cambiarPassword);
 
 module.exports = router;

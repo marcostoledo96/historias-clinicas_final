@@ -1,29 +1,53 @@
-# Historias Clínicas (Node/Express + PostgreSQL + Vanilla JS)
+# 🏥 Sistema de Historias Clínicas
 
-Aplicación web para gestionar pacientes, consultas y turnos. Backend en Node/Express con PostgreSQL; frontend vanilla (HTML/CSS/JS) servido por Express. Todo el código está documentado con Better Comments para facilitar el onboarding.
+![Node.js](https://img.shields.io/badge/Node.js-18+-green)
+![Express](https://img.shields.io/badge/Express-4.18+-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Compatible-blue)
+![Vercel](https://img.shields.io/badge/Deploy-Vercel-black)
 
-## Requisitos
+Sistema web completo que desarrollé para gestión de historias clínicas médicas. Backend en Node.js/Express con PostgreSQL y frontend en HTML/CSS/JavaScript vanilla.
 
-- Node.js 18+ (LTS recomendado)
-- PostgreSQL (local o en la nube; funciona muy bien con Supabase)
-- Windows PowerShell (estas instrucciones usan este shell)
+## 🌐 Demo en Vivo
 
-## Variables de entorno
+**[Ver Demo en Vercel →](https://tu-proyecto.vercel.app)**
 
-Crea un archivo `.env` dentro de `backend/` con:
+**Credenciales para probar:**
+- Usuario: `demo@historias.com` / `demo123`
+- Admin: `admin@historias.com` / `admin123`
+
+## ✨ Características que implementé
+
+- 🔐 **Autenticación segura** con sesiones
+- 👥 **Gestión completa de pacientes** 
+- 📋 **Historial médico** detallado
+- 📅 **Sistema de turnos**
+- 🎨 **Interfaz responsive**
+- 🗄️ **Base de datos PostgreSQL**
+- ☁️ **Deploy en Vercel**
+- 🎭 **Modo demo** sin afectar datos reales
+
+## Requisitos técnicos
+
+- Node.js 18+ (recomiendo la versión LTS)
+- PostgreSQL (local o en la nube - yo uso Supabase)
+- Windows PowerShell (las instrucciones están para este shell)
+
+## Configuración
+
+Necesitas crear un archivo `.env` dentro de `backend/` con estas variables:
 
 ```
-# Conexión a Postgres (elige 1 opción)
+# Conexión a PostgreSQL (puedes usar una de estas opciones)
 DATABASE_URL=postgres://usuario:password@host:5432/basedatos
-# ó variables por campo
+# O por separado:
 # DB_HOST=localhost
 # DB_PORT=5432
 # DB_USER=postgres
 # DB_PASSWORD=tu_password
 # DB_NAME=historias_clinicas
 
-# Sesiones
-SESSION_SECRET=un_super_secreto_seguro
+# Para las sesiones
+SESSION_SECRET=un_secreto_muy_seguro
 
 # Opcionales
 PORT=3000          # Si omites, usa 3000 por defecto. Si 3000 está ocupado, el servidor reintenta 3001..3005 automáticamente.

@@ -1,49 +1,51 @@
 @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,200..700,0..1,-50..200');
 
 /*
-  ! Hoja de estilos principal (frontend)
-  * Estándares y convenciones
-  *  - Design tokens: variables en :root y overrides en [data-theme="dark"]
-  *  - Utilidades atómicas para layout/espaciado/visibilidad
-  *  - Componentes base: card, table, btn, alert, badge, fieldset
-  *  - Responsive: breakpoints en 768px y 480px
-  ? Iconos Google Material Symbols via @import (usarlos con <span class="material-symbols-outlined">)</n+  TODO: centralizar tamaños de íconos por contexto (btn, headings) si hiciera falta
+  Hoja de estilos principal del sistema de historias clínicas
   
-  Índice rápido
-  1) Reset y Variables (Design tokens)
-  2) Tema oscuro ([data-theme="dark"]) 
-  3) Base (body, icon font, títulos)
+  Estructura y convenciones que uso:
+  - Variables CSS en :root para colores y medidas
+  - Tema oscuro con [data-theme="dark"]
+  - Clases utilitarias para layout (flex, gap, hidden, etc.)
+  - Componentes base: card, table, btn, alert, badge, fieldset
+  - Responsive con breakpoints en 768px y 480px
+  - Iconos de Google Material Symbols
+  
+  Índice:
+  1) Reset y Variables de diseño
+  2) Tema oscuro
+  3) Base (body, iconos, títulos)
   4) Layout principal (header, nav, content)
   5) Menú de usuario
   6) Footer
-  7) Botones (btn, variantes)
-  8) Formularios (labels, inputs, filas, fieldset)
+  7) Botones
+  8) Formularios
   9) Cards
   10) Tablas
   11) Alertas
-  12) Badges (incluye estados de turnos)
+  12) Badges
   13) Utilidades generales
   14) Modal overlay
   15) Loading spinner
-  16) Responsive (<=768px y <=480px)
-  17) Login (estilos específicos)
+  16) Responsive
+  17) Login específico
 */
 
 /*
  * Hoja de estilos principal
  *
- * Convenciones:
- * - Paleta y temas: variables CSS en :root y [data-theme="dark"].
- * - Utilidades: clases pequeñas para layout (flex, gap, hidden, etc.).
- * - Componentes: .card, .table, .btn, .alert, .badge.
- * - Responsive: media queries a 768px y 480px para compactar.
+ * Convenciones que manejo:
+ * - Paleta y temas: variables CSS en :root y [data-theme="dark"]
+ * - Utilidades: clases pequeñas para layout (flex, gap, hidden, etc.)
+ * - Componentes: .card, .table, .boton, .alert, .badge
+ * - Responsive: media queries a 768px y 480px para compactar
  *
  * Notas:
- * - Iconos Material Symbols via @import; usar <span class="material-symbols-outlined">edit</span>.
- * - .gap-sm-2 sólo aplica en ≤480px para compactar action bars.
+ * - Iconos Material Symbols via @import; uso <span class="material-symbols-outlined">edit</span>
+ * - .gap-sm-2 solo aplica en ≤480px para compactar action bars
  */
 
-/* ! 1) Reset y Variables (Design tokens) */
+/* Reset y Variables de diseño */
 * {
   margin: 0;
   padding: 0;
@@ -51,12 +53,10 @@
 }
 
 :root {
-  /* Colores azulados y neutros */
-  --color-primary: #3b82f6; /* azul un poco más claro */
+  /* Colores principales azulados y neutros */
+  --color-primary: #3b82f6; 
   --color-primary-dark: #2563eb;
-  /* --color-primary-light eliminado por no uso */
-  /* --color-secondary eliminado por no uso */
-  --color-accent: #22d3ee; /* acento más luminoso */
+  --color-accent: #22d3ee; 
   
   /* Colores de estado */
   --color-success: #10b981;
@@ -64,7 +64,7 @@
   --color-error: #ef4444;
   --color-info: #06b6d4;
   
-  /* Colores neutros */
+  /* Escala de grises */
   --color-white: #ffffff;
   --color-gray-50: #f8fafc;
   --color-gray-100: #f1f5f9;
@@ -163,7 +163,7 @@
   --color-cancelado-fg: #e5e7eb; /* gris claro para texto */
 }
 
-/* ! 3) Base */
+/* Base del sitio */
 body {
   font-family: var(--font-family);
   font-size: var(--font-size-base);
@@ -173,12 +173,93 @@ body {
   min-height: 100vh;
 }
 
-/* * Icon font: Google Material Symbols */
+/* Banner Demo - diseñé esto para mostrar cuando está en modo demostración */
+.banner-demo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  color: white;
+  z-index: 1000;
+  padding: 8px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.3s ease-out;
+}
+
+.contenido-demo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.icono-demo {
+  font-size: 18px;
+  animation: bounce 2s infinite;
+}
+
+.texto-demo {
+  flex: 1;
+  text-align: center;
+}
+
+.cerrar-demo {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.cerrar-demo:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-5px);
+  }
+  60% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Ajusto el contenido principal cuando hay banner demo */
+body:has(.banner-demo) .layout-main {
+  margin-top: 50px;
+}
+
+/* Iconos Material Symbols */
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
   font-weight: normal;
   font-style: normal;
-  font-size: 1.25em; /* tamaño base, ajustable en contexto */
+  font-size: 1.25em; /* tamaño base, lo ajusto según contexto */
   line-height: 1;
   letter-spacing: normal;
   text-transform: none;
@@ -198,17 +279,17 @@ body {
 }
 
 /* * Títulos por página/sección (helpers tipográficos) */
-.page-title { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.01em; }
-.section-title { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.005em; }
+.titulo-pagina { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.01em; }
+.titulo-seccion { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.005em; }
 
 /* ! 4) Layout principal */
-.main-layout {
+.diseno-principal {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-.content {
+.contenido {
   flex: 1;
   padding: var(--spacing-6);
   max-width: 1200px;
@@ -217,25 +298,25 @@ body {
 }
 
 /* * Header / Nav principal */
-.header {
+.encabezado {
   background: linear-gradient(135deg, rgba(59,130,246,1) 0%, rgba(37,99,235,1) 60%, rgba(30,64,175,1) 100%);
   color: var(--color-white);
   padding: var(--spacing-4) 0;
   box-shadow: var(--shadow-md);
 }
 
-[data-theme="dark"] .header {
+[data-theme="dark"] .encabezado {
   background: linear-gradient(135deg, #0f172a 0%, #0b1220 100%);
 }
 
-[data-theme="dark"] .nav-link {
+[data-theme="dark"] .enlace-navegacion {
   color: #e5e7eb;
 }
 
-[data-theme="dark"] .nav-link:hover { background-color: rgba(96,165,250,0.12); }
-[data-theme="dark"] .nav-link.active { background-color: rgba(96,165,250,0.20); box-shadow: inset 0 -3px 0 0 #60a5fa; }
+[data-theme="dark"] .enlace-navegacion:hover { background-color: rgba(96,165,250,0.12); }
+[data-theme="dark"] .enlace-navegacion.active { background-color: rgba(96,165,250,0.20); box-shadow: inset 0 -3px 0 0 #60a5fa; }
 
-.header-container {
+.encabezado-container {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
@@ -255,16 +336,16 @@ body {
 .logo-icon { font-size: 1.5rem; }
 .logo-text { font-size: var(--font-size-xl); font-weight: 700; }
 
-.nav-menu {
+.menu-navegacion {
   display: flex;
   gap: var(--spacing-6);
 }
 
 /* * Toggle (hamburguesa) oculto por defecto en desktop */
-.nav-toggle { display: none; background: transparent; border: 1px solid rgba(255,255,255,0.5); color: #fff; padding: 6px 10px; border-radius: var(--border-radius); cursor: pointer; }
-.nav-toggle:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.2); }
+.boton-menu { display: none; background: transparent; border: 1px solid rgba(255,255,255,0.5); color: #fff; padding: 6px 10px; border-radius: var(--border-radius); cursor: pointer; }
+.boton-menu:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.2); }
 
-.nav-link {
+.enlace-navegacion {
   color: var(--color-white);
   text-decoration: none;
   padding: 10px 14px;
@@ -275,19 +356,19 @@ body {
   gap: var(--spacing-2);
 }
 
-.nav-link:hover {
+.enlace-navegacion:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.nav-link.active { background-color: rgba(255,255,255,0.22); }
+.enlace-navegacion.active { background-color: rgba(255,255,255,0.22); }
 
-.nav-link:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.25); }
-[data-theme="dark"] .nav-link:focus-visible { box-shadow: 0 0 0 3px rgba(96,165,250,0.35); }
+.enlace-navegacion:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.25); }
+[data-theme="dark"] .enlace-navegacion:focus-visible { box-shadow: 0 0 0 3px rgba(96,165,250,0.35); }
 
 /* ? .user-info eliminado por no uso (dejar referencia para futuros refactors) */
 
 /* * Acciones del header (botón tema + menú usuario) */
-.header-actions { display: flex; align-items: center; gap: var(--spacing-4); }
+.encabezado-actions { display: flex; align-items: center; gap: var(--spacing-4); }
 
 /* ! 5) Menú de usuario */
 .user-menu { position: relative; }
@@ -328,7 +409,7 @@ body {
 .hidden { display: none !important; }
 
 /* ! 6) Footer */
-.footer {
+.pie-pagina {
   background-color: var(--color-gray-800);
   color: var(--color-gray-300);
   text-align: center;
@@ -336,17 +417,17 @@ body {
   margin-top: auto;
 }
 
-[data-theme="dark"] .footer {
+[data-theme="dark"] .pie-pagina {
   background-color: #0b1220;
   color: var(--color-gray-600);
 }
 
-.footer-container p {
+.pie-pagina-container p {
   margin: var(--spacing-1) 0;
 }
 
 /* ! 7) Botones */
-.btn {
+.boton {
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-2);
@@ -361,124 +442,124 @@ body {
   text-align: center;
 }
 
-.btn:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25); }
-[data-theme="dark"] .btn:focus-visible { box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.35); }
+.boton:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25); }
+[data-theme="dark"] .boton:focus-visible { box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.35); }
 
-.btn-primary {
+.boton-primary {
   background-color: var(--color-primary);
   color: var(--color-white);
 }
 
-.btn-primary:hover {
+.boton-primary:hover {
   background-color: var(--color-primary-dark);
 }
 
-.btn-secondary {
+.boton-secondary {
   /* En tema claro: botón gris CLARO con texto oscuro para mejor legibilidad */
   background-color: var(--color-gray-200);
   color: var(--color-gray-900);
 }
 
-.btn-secondary:hover {
+.boton-secondary:hover {
   background-color: var(--color-gray-300);
 }
 
 /* === Dark mode: Botones con mejor contraste y coherencia cromática === */
-[data-theme="dark"] .btn { color: #fff; }
+[data-theme="dark"] .boton { color: #fff; }
 
 /* Primario: azul legible sobre fondos oscuros */
-[data-theme="dark"] .btn-primary { background-color: #1e40af; }
-[data-theme="dark"] .btn-primary:hover { background-color: #1e3a8a; }
+[data-theme="dark"] .boton-primary { background-color: #1e40af; }
+[data-theme="dark"] .boton-primary:hover { background-color: #1e3a8a; }
 
 /* Secundario: gris azulado consistente con la paleta oscura */
-[data-theme="dark"] .btn-secondary {
+[data-theme="dark"] .boton-secondary {
   /* Variante más oscura y con borde sutil para mejor contraste en oscuro */
   background-color: var(--color-gray-300);
   color: #e5e7eb;
   border: 1px solid var(--color-gray-400);
 }
-[data-theme="dark"] .btn-secondary:hover {
+[data-theme="dark"] .boton-secondary:hover {
   background-color: var(--color-gray-400);
   border-color: var(--color-gray-500);
 }
 
 /* Éxito / Error con tonos más sobrios en oscuro */
-[data-theme="dark"] .btn-success { background-color: #047857; }
-[data-theme="dark"] .btn-success:hover { background-color: #065f46; }
+[data-theme="dark"] .boton-success { background-color: #047857; }
+[data-theme="dark"] .boton-success:hover { background-color: #065f46; }
 
-[data-theme="dark"] .btn-error { background-color: #ef4444; }
-[data-theme="dark"] .btn-error:hover { background-color: #dc2626; }
+[data-theme="dark"] .boton-error { background-color: #ef4444; }
+[data-theme="dark"] .boton-error:hover { background-color: #dc2626; }
 
 /* Outline/ghost: mantener contraste y feedback en hover */
-[data-theme="dark"] .btn-outline { color: #93c5fd; border-color: #60a5fa; }
-[data-theme="dark"] .btn-outline:hover { background: rgba(96,165,250,0.12); }
+[data-theme="dark"] .boton-outline { color: #93c5fd; border-color: #60a5fa; }
+[data-theme="dark"] .boton-outline:hover { background: rgba(96,165,250,0.12); }
 
-[data-theme="dark"] .btn-ghost { color: #93c5fd; }
-[data-theme="dark"] .btn-ghost:hover { background: rgba(255,255,255,0.06); }
+[data-theme="dark"] .boton-ghost { color: #93c5fd; }
+[data-theme="dark"] .boton-ghost:hover { background: rgba(255,255,255,0.06); }
 
 /* Botón por defecto (sin variante) en oscuro: fondo/borde sutiles para mejor legibilidad */
-[data-theme="dark"] .btn:not(.btn-primary,.btn-secondary,.btn-success,.btn-error,.btn-outline,.btn-ghost) {
+[data-theme="dark"] .boton:not(.boton-primary,.boton-secondary,.boton-success,.boton-error,.boton-outline,.boton-ghost) {
   background-color: rgba(255,255,255,0.08);
   color: #e5e7eb;
   border: 1px solid rgba(255,255,255,0.12);
 }
-[data-theme="dark"] .btn:not(.btn-primary,.btn-secondary,.btn-success,.btn-error,.btn-outline,.btn-ghost):hover {
+[data-theme="dark"] .boton:not(.boton-primary,.boton-secondary,.boton-success,.boton-error,.boton-outline,.boton-ghost):hover {
   background-color: rgba(255,255,255,0.14);
   border-color: rgba(255,255,255,0.18);
 }
 
-.btn-outline { background: transparent; color: var(--color-primary); border: 1px solid var(--color-primary); }
-.btn-outline:hover { background: rgba(37,99,235,0.08); }
-.btn-ghost { background: transparent; color: var(--color-primary); }
-.btn-ghost:hover { background: rgba(0,0,0,0.05); }
+.boton-outline { background: transparent; color: var(--color-primary); border: 1px solid var(--color-primary); }
+.boton-outline:hover { background: rgba(37,99,235,0.08); }
+.boton-ghost { background: transparent; color: var(--color-primary); }
+.boton-ghost:hover { background: rgba(0,0,0,0.05); }
 
-.btn-success {
+.boton-success {
   background-color: var(--color-success);
   color: var(--color-white);
 }
 
-.btn-success:hover {
+.boton-success:hover {
   background-color: #059669;
 }
 
-.btn-warning {
+.boton-warning {
   background-color: var(--color-warning);
   color: var(--color-white);
 }
 
-.btn-warning:hover {
+.boton-warning:hover {
   background-color: #d97706;
 }
-/* .btn-warning eliminado por no uso */
+/* .boton-warning eliminado por no uso */
 
-.btn-error {
+.boton-error {
   background-color: var(--color-error);
   color: var(--color-white);
 }
 
-.btn-error:hover {
+.boton-error:hover {
   background-color: #dc2626;
 }
 
-.btn-sm {
+.boton-sm {
   padding: var(--spacing-1) var(--spacing-3);
   font-size: var(--font-size-sm);
 }
 
-.btn-lg {
+.boton-lg {
   padding: var(--spacing-3) var(--spacing-6);
   font-size: var(--font-size-lg);
 }
 
 /* Botón con altura de campo (igual a .form-input) */
-.btn-field { padding: var(--spacing-3) var(--spacing-4); font-size: var(--font-size-base); }
+.boton-field { padding: var(--spacing-3) var(--spacing-4); font-size: var(--font-size-base); }
 
 /* ! 8) Formularios */
-.form-group {
+.grupo-formulario {
   margin-bottom: var(--spacing-4);
 }
 
-.form-label {
+.etiqueta-formulario {
   display: block;
   margin-bottom: var(--spacing-2);
   font-weight: 500;
@@ -536,7 +617,7 @@ textarea.form-input {
   border-color: var(--color-gray-400);
 }
 
-.form-row {
+.fila-formulario {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: var(--spacing-4);
@@ -544,32 +625,32 @@ textarea.form-input {
 
 
 /* * Variante de fila con 3 columnas en proporción 20% / 30% / 50% */
-.form-row-203050 {
+.fila-formulario-203050 {
   /* Usar fr evita overflow por gap sumado a % */
   grid-template-columns: 2fr 3fr 5fr;
   align-items: start;
 }
 
 @media (max-width: 1024px) {
-  .form-row-203050 { grid-template-columns: 1fr 1fr; }
+  .fila-formulario-203050 { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 768px) {
-  .form-row-203050 { grid-template-columns: 1fr; }
+  .fila-formulario-203050 { grid-template-columns: 1fr; }
 }
 
 /* * Variante de fila con 2 columnas en proporción 1/4 y 3/4 */
-.form-row-1434 {
+.fila-formulario-1434 {
   grid-template-columns: 1fr 3fr;
   align-items: start;
 }
 
 @media (max-width: 768px) {
-  .form-row-1434 { grid-template-columns: 1fr; }
+  .fila-formulario-1434 { grid-template-columns: 1fr; }
 }
 
 /* ? Inputs que deben compartir línea con otros elementos (evitar width:100%) */
-.form-input-grow {
+.entrada-formulario-expandir {
   width: auto;
   flex: 1 1 0;
   min-width: 0;
@@ -581,24 +662,24 @@ textarea.form-input {
 }
 
 /* * Fieldsets para agrupar subcampos con leyenda */
-.fieldset {
+.conjunto-campos {
   border: 1px solid var(--color-gray-200);
   border-radius: var(--border-radius);
   padding: var(--spacing-4);
   margin-bottom: var(--spacing-4);
 }
 
-[data-theme="dark"] .fieldset {
+[data-theme="dark"] .conjunto-campos {
   border-color: var(--color-gray-300);
 }
 
-.fieldset-legend {
+.conjunto-campos-legend {
   font-weight: 600;
   color: var(--color-gray-700);
   padding: 0 var(--spacing-2);
 }
 
-[data-theme="dark"] .fieldset-legend {
+[data-theme="dark"] .conjunto-campos-legend {
   color: var(--color-gray-700);
 }
 
@@ -895,8 +976,8 @@ textarea.form-input {
 .hidden.loading { display: none !important; }
 
 /* * Spinner: variantes según tema/contexto */
-.btn .loading { border-color: rgba(255,255,255,0.35); border-top-color: #fff; }
-[data-theme="dark"] .btn .loading { border-color: rgba(255,255,255,0.25); border-top-color: #fff; }
+.boton .loading { border-color: rgba(255,255,255,0.35); border-top-color: #fff; }
+[data-theme="dark"] .boton .loading { border-color: rgba(255,255,255,0.25); border-top-color: #fff; }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
@@ -913,7 +994,7 @@ textarea.form-input {
 /* ! 16) Responsive */
 @media (max-width: 768px) {
   /* Header en una sola fila (logo a la izquierda; controles a la derecha) y menú debajo al abrir */
-  .header-container {
+  .encabezado-container {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
@@ -922,16 +1003,16 @@ textarea.form-input {
   }
   .logo { flex: 1 1 auto; }
   /* Mostrar toggle y colapsar menú a segunda fila */
-  .nav-toggle { display: inline-flex; }
-  .nav-menu { display: none; flex-direction: column; width: 100%; gap: var(--spacing-2); }
-  .nav-menu.open { display: flex; }
-  .nav-link { width: 100%; justify-content: flex-start; }
+  .boton-menu { display: inline-flex; }
+  .menu-navegacion { display: none; flex-direction: column; width: 100%; gap: var(--spacing-2); }
+  .menu-navegacion.open { display: flex; }
+  .enlace-navegacion { width: 100%; justify-content: flex-start; }
   
-  .content {
+  .contenido {
     padding: var(--spacing-4);
   }
   
-  .form-row {
+  .fila-formulario {
     grid-template-columns: 1fr;
   }
   
@@ -988,7 +1069,7 @@ textarea.form-input {
 .login-header p { color: var(--color-gray-600); }
 [data-theme="dark"] .login-header p { color: var(--color-gray-700); }
 .login-remember { display:flex; align-items:center; gap:8px; }
-.btn-inline { display:flex; align-items:center; justify-content:center; gap:8px; }
+.boton-inline { display:flex; align-items:center; justify-content:center; gap:8px; }
 .login-help { margin-top: var(--spacing-6); text-align: center; color: var(--color-gray-500); font-size: var(--font-size-sm); }
 .login-help .links { margin-top: var(--spacing-4); }
 /* Toggle de tema cuando no hay header (login/recuperar/registro) */

@@ -1,17 +1,15 @@
-// * Modelo: Paciente
-// * Responsable de las operaciones CRUD sobre la tabla `pacientes`.
-// * Patrón: Active Record sencillo usando `pg` con Pool compartido.
-// ? Todas las consultas filtran por `activo = true` cuando corresponde (soft-delete).
-// ! Errores: cualquier fallo en DB se propaga y debe ser capturado por el controlador.
-const pool = require('../db/connection');
+// Modelo: Paciente
+// Responsable de las operaciones CRUD sobre la tabla `pacientes`
+// Uso el patrón Active Record con `pg` y Pool compartido
+// Todas las consultas filtran por `activo = true` (soft-delete)
+// Los errores de BD se propagan y deben ser capturados por el controlador
+const conexionBD = require('../db/connection');
 
 class Paciente {
-  // * obtenerTodos()
-  // > Lista todos los pacientes activos, ordenados por Apellido, Nombre.
-  // ! Retorna un array vacío si no hay registros.
+  // Obtener todos los pacientes activos
   static async obtenerTodos(idUsuario) {
     try {
-      const result = await pool.query(
+      const resultado = await conexionBD.query(
   `SELECT id_paciente, nombre, apellido, dni, fecha_nacimiento, sexo, 
    telefono, telefono_adicional, email, cobertura, plan, numero_afiliado, localidad, direccion, 
          ocupacion, fecha_registro 
@@ -19,48 +17,42 @@ class Paciente {
          WHERE activo = true AND id_usuario = $1 
          ORDER BY apellido, nombre`
       , [idUsuario]);
-      return result.rows;
+      return resultado.rows;
     } catch (error) {
       throw error;
     }
   }
 
-  // * buscarPorId(id)
-  // ? Parámetros: id (number)
-  // > Devuelve el paciente activo con ese id o undefined si no existe.
+  // Buscar paciente por ID
   static async buscarPorId(id, idUsuario) {
     try {
-      const result = await pool.query(
+      const resultado = await conexionBD.query(
         `SELECT * FROM pacientes WHERE id_paciente = $1 AND activo = true AND id_usuario = $2`,
         [id, idUsuario]
       );
-      return result.rows[0];
+      return resultado.rows[0];
     } catch (error) {
       throw error;
     }
   }
 
-  // * buscarPorDni(dni)
-  // ? Parámetros: dni (string | number)
-  // > Devuelve el paciente activo con ese DNI o undefined si no existe.
+  // Buscar paciente por DNI
   static async buscarPorDni(dni, idUsuario) {
     try {
-      const result = await pool.query(
+      const resultado = await conexionBD.query(
   'SELECT * FROM pacientes WHERE dni = $1 AND activo = true AND id_usuario = $2',
         [dni, idUsuario]
       );
-      return result.rows[0];
+      return resultado.rows[0];
     } catch (error) {
       throw error;
     }
   }
 
-  // * buscar(termino)
-  // ? Parámetros: termino (string) - se usa en LIKE contra nombre, apellido y dni
-  // > Devuelve pacientes activos que coinciden con el término (case-insensitive), ordenados.
+  // Buscar pacientes por término
   static async buscar(termino, idUsuario) {
     try {
-      const result = await pool.query(
+      const resultado = await conexionBD.query(
         `SELECT id_paciente, nombre, apellido, dni, fecha_nacimiento, sexo, 
       telefono, telefono_adicional, email, cobertura, plan 
          FROM pacientes 
@@ -71,25 +63,22 @@ class Paciente {
          ORDER BY apellido, nombre`,
         [`%${termino}%`, idUsuario]
       );
-      return result.rows;
+      return resultado.rows;
     } catch (error) {
       throw error;
     }
   }
 
-  // * crear(datospaciente)
-  // ? Requiere: nombre, apellido (y opcionalmente el resto de campos). DNI puede ser null.
-  // > Inserta un paciente completo. Retorna { id_paciente } del nuevo registro.
-  // ! Validaciones de negocio (unicidad DNI, etc.) deben hacerse en controlador/DB.
-  static async crear(datospaciente, idUsuario) {
+  // Crear nuevo paciente
+  static async crear(datosPaciente, idUsuario) {
     try {
       const {
         nombre, apellido, dni, fecha_nacimiento, sexo, telefono, telefono_adicional, email,
         cobertura, plan, numero_afiliado, localidad, direccion, ocupacion,
         enfermedades_preexistentes, alergias, observaciones
-      } = datospaciente;
+      } = datosPaciente;
 
-      const result = await pool.query(
+      const resultado = await conexionBD.query(
         `INSERT INTO pacientes (
           id_usuario, nombre, apellido, dni, fecha_nacimiento, sexo, telefono, telefono_adicional, email,
           cobertura, plan, numero_afiliado, localidad, direccion, ocupacion,
@@ -102,39 +91,35 @@ class Paciente {
             enfermedades_preexistentes, alergias, observaciones
         ]
       );
-      return result.rows[0];
+      return resultado.rows[0];
     } catch (error) {
       throw error;
     }
   }
 
-  // * crearMinimo({ nombre, apellido })
-  // > Inserta un paciente sólo con nombre y apellido. Útil para alta rápida.
-  // > Retorna { id_paciente, nombre, apellido }.
+  // Crear paciente con datos mínimos
   static async crearMinimo({ nombre, apellido }, idUsuario) {
     try {
-      const result = await pool.query(
+      const resultado = await conexionBD.query(
         `INSERT INTO pacientes (id_usuario, nombre, apellido) VALUES ($1, $2, $3) RETURNING id_paciente, nombre, apellido`,
         [idUsuario, nombre, apellido]
       );
-      return result.rows[0];
+      return resultado.rows[0];
     } catch (error) {
       throw error;
     }
   }
 
-  // * actualizar(id, datospaciente)
-  // ? Parámetros: id (number), datospaciente (objeto con los mismos campos que crear)
-  // > Retorna el registro actualizado o undefined si no existe o está inactivo.
-  static async actualizar(id, datospaciente, idUsuario) {
+  // Actualizar paciente existente
+  static async actualizar(id, datosPaciente, idUsuario) {
     try {
       const {
         nombre, apellido, dni, fecha_nacimiento, sexo, telefono, telefono_adicional, email,
         cobertura, plan, numero_afiliado, localidad, direccion, ocupacion,
         enfermedades_preexistentes, alergias, observaciones
-      } = datospaciente;
+      } = datosPaciente;
 
-      const result = await pool.query(
+      const resultado = await conexionBD.query(
         `UPDATE pacientes SET 
          nombre = $1, apellido = $2, dni = $3, fecha_nacimiento = $4, 
          sexo = $5, telefono = $6, telefono_adicional = $7, email = $8, cobertura = $9, plan = $10,
@@ -148,21 +133,20 @@ class Paciente {
           enfermedades_preexistentes, alergias, observaciones, id, idUsuario
         ]
       );
-      return result.rows[0];
+      return resultado.rows[0];
     } catch (error) {
       throw error;
     }
   }
 
-  // * eliminar(id)
-  // > Soft-delete: marca `activo = false`. Retorna { id_paciente } o undefined si no existe.
+  // Eliminar paciente (soft-delete)
   static async eliminar(id, idUsuario) {
     try {
-      const result = await pool.query(
+      const resultado = await conexionBD.query(
         'UPDATE pacientes SET activo = false WHERE id_paciente = $1 AND id_usuario = $2 RETURNING id_paciente',
         [id, idUsuario]
       );
-      return result.rows[0];
+      return resultado.rows[0];
     } catch (error) {
       throw error;
     }

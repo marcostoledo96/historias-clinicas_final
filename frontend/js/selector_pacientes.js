@@ -17,14 +17,14 @@
         <div class="card-body">
           <div class="form-row">
             <div class="form-group w-full">
-              <label class="form-label">Buscar</label>
+              <label class="etiqueta-formulario">Buscar</label>
               <input id="selpac-busqueda" class="form-input" placeholder="Nombre, apellido o DNI" />
             </div>
-            <div class="form-group">
-              <label class="form-label">Acciones</label>
+            <div class="grupo-formulario">
+              <label class="etiqueta-formulario">Acciones</label>
               <div class="flex gap-2">
                 <button id="selpac-btn-buscar" class="btn btn-primary">Buscar</button>
-                <button id="selpac-btn-limpiar" class="btn">Limpiar</button>
+                <button id="selpac-btn-limpiar" class="boton">Limpiar</button>
               </div>
             </div>
           </div>
@@ -75,11 +75,11 @@
     const totalPaginas = Math.max(1, Math.ceil(total / selState.tam));
     const cont = document.getElementById('selpac-paginacion');
     const p = selState.pagina;
-    const btn = (label, disabled, on) => `<button class="btn btn-sm ${disabled? 'btn-secondary':''}" ${disabled? 'disabled':''} data-page="${on}">${label}</button>`;
+    const btn = (label, disabled, on) => `<button class="btn btn-sm ${disabled? 'boton-secundario':''}" ${disabled? 'disabled':''} data-page="${on}">${label}</button>`;
     let items = [];
     items.push(btn('« Prev', p===1, p-1));
     const maxNums = 5; let start = Math.max(1, p - Math.floor(maxNums/2)); let end = Math.min(totalPaginas, start + maxNums -1); if (end - start < maxNums -1) start = Math.max(1, end - maxNums + 1);
-    for (let i = start; i <= end; i++) items.push(`<button class="btn btn-sm ${i===p?'btn-primary':''}" data-page="${i}">${i}</button>`);
+    for (let i = start; i <= end; i++) items.push(`<button class="btn btn-sm ${i===p?'boton-primario':''}" data-page="${i}">${i}</button>`);
     items.push(btn('Next »', p===totalPaginas, p+1));
     cont.innerHTML = items.join(' ');
   }
@@ -147,3 +147,4 @@
   // * Exponer globalmente la función de apertura
   window.abrirSelectorPacientes = abrirSelectorPacientes;
 })();
+

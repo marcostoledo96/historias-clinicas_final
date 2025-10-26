@@ -2,7 +2,7 @@ const Turno = require('../models/Turno');
 
 // ! Controlador: Turnos
 // ? Lógica para manejar turnos (listado, creación, actualización, situación)
-const turnosController = {
+const controladorTurnos = {
   // GET /api/turnos
   // * Lista turnos (hoy=true, por día, por paciente o todos)
   obtenerTurnos: async (req, res) => {
@@ -239,4 +239,4 @@ const turnosController = {
   }
 };
 
-module.exports = turnosController;
+module.exports = controladorTurnos;

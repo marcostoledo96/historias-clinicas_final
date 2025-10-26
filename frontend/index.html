@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" contenido="width=device-width, initial-scale=1.0">
     <title>Login - Sistema de Historias Clínicas</title>
     <link rel="stylesheet" href="css/styles.css">
         <script>
@@ -20,7 +20,7 @@
     
 </head>
 <body>
-        <button id="theme-toggle-standalone" class="theme-standalone-btn" aria-label="Alternar tema" title="Alternar tema">
+        <button id="theme-toggle-standalone" class="theme-standalone-boton" aria-label="Alternar tema" title="Alternar tema">
             <span class="material-symbols-outlined" aria-hidden="true">dark_mode</span>
         </button>
     <div class="login-container">
@@ -33,8 +33,8 @@
             <form id="loginForm">
                 <div id="alert-container"></div>
                 
-                <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
+                <div class="grupo-formulario">
+                    <label for="email" class="etiqueta-formulario">Email</label>
                     <input 
                         type="email" 
                         id="email" 
@@ -45,8 +45,8 @@
                     >
                 </div>
                 
-                <div class="form-group">
-                    <label for="password" class="form-label">Contraseña</label>
+                <div class="grupo-formulario">
+                    <label for="password" class="etiqueta-formulario">Contraseña</label>
                     <input 
                         type="password" 
                         id="password" 
@@ -57,12 +57,12 @@
                     >
                 </div>
                 
-                <div class="form-group login-remember">
+                <div class="grupo-formulario login-remember">
                     <input type="checkbox" id="remember" name="remember" />
-                    <label for="remember" class="form-label" style="margin:0;">Mantener sesión iniciada</label>
+                    <label for="remember" class="etiqueta-formulario" style="margin:0;">Mantener sesión iniciada</label>
                 </div>
 
-                <button type="submit" id="btnLogin" class="btn btn-primary w-full btn-inline">
+                <button type="submit" id="btnLogin" class="boton boton-primario w-full boton-inline">
                     <span id="login-text">Iniciar Sesión</span>
                     <span id="login-loading" class="loading hidden" aria-hidden="true"></span>
                 </button>
@@ -116,7 +116,7 @@
                 const response = await fetch('/api/auth/login', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'contenido-Type': 'application/json'
                     },
                     credentials: 'include',
                     body: JSON.stringify(loginData)
@@ -146,18 +146,18 @@
 
                 // Toggle de tema standalone
                 (function(){
-                    const btn = document.getElementById('theme-toggle-standalone');
-                    if (!btn) return;
-                    const icon = btn.querySelector('.material-symbols-outlined');
+                    const boton = document.getElementById('theme-toggle-standalone');
+                    if (!boton) return;
+                    const icon = boton.querySelector('.material-symbols-outlined');
                     const getTheme = () => document.documentElement.getAttribute('data-theme') || 'light';
                     const setIcon = () => {
                         const t = getTheme();
                         icon.textContent = t === 'dark' ? 'light_mode' : 'dark_mode';
-                        btn.setAttribute('aria-label', `Alternar a tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
-                        btn.setAttribute('title', `Tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
+                        boton.setAttribute('aria-label', `Alternar a tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
+                        boton.setAttribute('title', `Tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
                     };
                     setIcon();
-                    btn.addEventListener('click', () => {
+                    boton.addEventListener('click', () => {
                         const current = getTheme();
                         const next = current === 'dark' ? 'light' : 'dark';
                         document.documentElement.setAttribute('data-theme', next);
@@ -168,3 +168,4 @@
     </script>
 </body>
 </html>
+

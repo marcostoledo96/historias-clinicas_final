@@ -1,7 +1,7 @@
-// * Modelo: Usuario
-// * Maneja autenticación, perfiles y administración de usuarios.
-// * Las contraseñas se almacenan como `password_hash` (bcrypt) y nunca se exponen salvo donde explícitamente se busca con hash.
-// ! Cualquier error de DB se propaga; los controladores deben capturarlo y traducirlo.
+// Modelo: Usuario
+// Manejo autenticación, perfiles y administración de usuarios
+// Las contraseñas las almaceno como `password_hash` (bcrypt) y nunca las expongo
+// Los errores de BD se propagan, los controladores los capturan y traducen
 const pool = require('../db/connection');
 
 class Usuario {

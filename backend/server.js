@@ -1,52 +1,74 @@
-// ! Punto de entrada del backend Express
-// ? Este archivo levanta el servidor, configura middlewares, sesiones, rutas y sirve el frontend
-// TODO: Si agregas nuevas rutas, impórtalas y móntalas aquí
+// Servidor principal del backend
+// Acá configuro Express, middlewares, sesiones, rutas y sirvo el frontend estático
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const path = require('path');
 const { exec } = require('child_process');
-// * Cargar variables de entorno desde .env (puerto, credenciales DB, secretos, etc.)
+// Cargo las variables de entorno desde .env
 require('dotenv').config();
 
 const app = express();
-// * Puerto de escucha (por defecto 3000)
+// Puerto donde va a escuchar el servidor (por defecto 3000)
 const PORT = process.env.PORT || 3000;
 
 // Middlewares
-// * CORS: permitir cookies/sesiones desde el frontend servido localmente
+// CORS: permito cookies/sesiones desde el frontend y Vercel
+const allowedOrigins = [
+  'http://localhost:3000', 
+  'http://127.0.0.1:5500',
+  process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`,
+  process.env.VERCEL_BRANCH_URL && `https://${process.env.VERCEL_BRANCH_URL}`
+].filter(Boolean);
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:5500'],
+  origin: function (origin, callback) {
+    // Permito requests sin origin (aplicaciones móviles, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    // Permito cualquier subdominio de vercel.app para la demo
+    if (origin.includes('.vercel.app')) return callback(null, true);
+    
+    // Verifico origins específicos
+    if (allowedOrigins.indexOf(origin) !== -1) return callback(null, true);
+    
+    callback(new Error('No permitido por CORS'));
+  },
   credentials: true
 }));
 
-// * Body parsers para JSON y formularios (x-www-form-urlencoded)
+// Body parsers para JSON y formularios
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Configuración de sesiones
-// * Sesiones en memoria (cambiar a store persistente en producción)
+// Uso sesiones en memoria (en producción sería mejor un store persistente)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'historias_clinicas_secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // true en producción con HTTPS
-    maxAge: 24 * 60 * 60 * 1000 // 24 horas
+    secure: process.env.NODE_ENV === 'production', // HTTPS en producción
+    maxAge: 24 * 60 * 60 * 1000, // 24 horas
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   }
 }));
 
-// Servir archivos estáticos del frontend
-// * Servir el frontend estático (HTML/CSS/JS) desde la carpeta frontend
+// Sirvo archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// * Importar y montar rutas de la API (MVC)
+// Middleware para modo demo
+const { modoDemo, interceptarOperacionesDemo } = require('./middlewares/demoMode');
+app.use(modoDemo);
+app.use(interceptarOperacionesDemo);
+
+// Importo y monto las rutas de la API
 const authRoutes = require('./routes/auth');
 const pacientesRoutes = require('./routes/pacientes');
 const consultasRoutes = require('./routes/consultas');
 const turnosRoutes = require('./routes/turnos');
 
-// Usar las rutas
+// Uso las rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/consultas', consultasRoutes);
