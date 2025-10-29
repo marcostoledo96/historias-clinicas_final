@@ -1,15 +1,33 @@
 const Paciente = require('../models/Paciente');
+const demoStore = require('../middlewares/demoStore');
 
-// ! Controlador: Pacientes
-// ? Lógica de negocio para CRUD de pacientes y búsquedas
-const pacientesController = {
-  // GET /api/pacientes
-  // * Lista pacientes (con query buscar opcional)
+// Controlador para manejo de pacientes
+// Aquí manejo toda la lógica CRUD de pacientes, con soporte para usuarios demo
+const controladorPacientes = {
+  // Obtener lista de pacientes (con búsqueda opcional)
   obtenerPacientes: async (req, res) => {
     try {
       const { buscar } = req.query;
       const idUsuario = req.session?.usuario?.id;
       if (!idUsuario) return res.status(401).json({ error: 'No autenticado' });
+      
+      // Para usuarios demo, uso datos temporales en memoria
+      if (req.esUsuarioDemo) {
+        const datosUsuario = demoStore.getUserData(req.idUsuarioDemo);
+        let pacientes = datosUsuario.pacientes;
+        
+        if (buscar) {
+          const buscarMinuscula = buscar.toLowerCase();
+          pacientes = pacientes.filter(p => 
+            p.nombre.toLowerCase().includes(buscarMinuscula) ||
+            p.apellido.toLowerCase().includes(buscarMinuscula) ||
+            p.documento.includes(buscar) ||
+            p.email.toLowerCase().includes(buscarMinuscula)
+          );
+        }
+        
+        return res.json(pacientes);
+      }
       
       let pacientes;
       if (buscar) {
@@ -25,13 +43,25 @@ const pacientesController = {
     }
   },
 
-  // GET /api/pacientes/:id
-  // * Obtiene paciente por ID
+  // Obtener un paciente específico por ID
   obtenerPacientePorId: async (req, res) => {
     try {
       const { id } = req.params;
       const idUsuario = req.session?.usuario?.id;
       if (!idUsuario) return res.status(401).json({ error: 'No autenticado' });
+      
+      // Para usuarios demo, busco en los datos temporales
+      if (req.esUsuarioDemo) {
+        const datosUsuario = demoStore.getUserData(req.idUsuarioDemo);
+        const paciente = datosUsuario.pacientes.find(p => p.id == id);
+        
+        if (!paciente) {
+          return res.status(404).json({ error: 'Paciente no encontrado' });
+        }
+        
+        return res.json(paciente);
+      }
+      
       const paciente = await Paciente.buscarPorId(id, idUsuario);
 
       if (!paciente) {
@@ -45,17 +75,37 @@ const pacientesController = {
     }
   },
 
-  // POST /api/pacientes
-  // * Crea paciente con datos completos (requiere nombre y apellido)
+  // Crear un nuevo paciente
   crearPaciente: async (req, res) => {
     try {
       const idUsuario = req.session?.usuario?.id;
       if (!idUsuario) return res.status(401).json({ error: 'No autenticado' });
+      
       const {
         nombre, apellido, dni, fecha_nacimiento, sexo, telefono, telefono_adicional, email,
         cobertura, plan, numero_afiliado, localidad, direccion, ocupacion,
         enfermedades_preexistentes, alergias, observaciones
       } = req.body;
+      
+      // Para usuarios demo, creo el paciente solo en memoria
+      if (req.esUsuarioDemo) {
+        if (!nombre || !apellido) {
+          return res.status(400).json({ error: 'Nombre y apellido son requeridos' });
+        }
+        
+        const nuevoPaciente = demoStore.addPaciente(req.idUsuarioDemo, {
+          nombre, apellido, documento: dni, fecha_nacimiento, sexo, telefono, 
+          telefono_adicional, email, obra_social: cobertura, plan, numero_afiliado, 
+          localidad, direccion, ocupacion, enfermedades_preexistentes, alergias, observaciones
+        });
+        
+        return res.status(201).json({
+          exito: true,
+          mensaje: 'Paciente creado en modo demo (temporal)',
+          paciente: nuevoPaciente,
+          demo: true
+        });
+      }
 
       // Validaciones básicas
       if (!nombre || !apellido) {
@@ -202,4 +252,4 @@ const pacientesController = {
   }
 };
 
-module.exports = pacientesController;
+module.exports = controladorPacientes;

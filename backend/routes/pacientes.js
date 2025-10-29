@@ -2,7 +2,7 @@
 // ? CRUD de pacientes y búsquedas
 const express = require('express');
 const router = express.Router();
-const pacientesController = require('../controllers/pacientesController');
+const controladorPacientes = require('../controllers/pacientesController');
 const { verificarAuth, verificarDoctor, logging, validarCamposRequeridos } = require('../middlewares/auth');
 
 // * Middlewares por defecto: logging, sesión, rol doctor
@@ -12,35 +12,35 @@ router.use(verificarDoctor);
 
 // * GET /api/pacientes
 //   Query opcional: q=texto (nombre, apellido o DNI)
-router.get('/', pacientesController.obtenerPacientes);
+router.get('/', controladorPacientes.obtenerPacientes);
 
 // * GET /api/pacientes/:id
-router.get('/:id', pacientesController.obtenerPacientePorId);
+router.get('/:id', controladorPacientes.obtenerPacientePorId);
 
 // * GET /api/pacientes/buscar/:dni
-router.get('/buscar/:dni', pacientesController.buscarPorDni);
+router.get('/buscar/:dni', controladorPacientes.buscarPorDni);
 
 // * POST /api/pacientes
 //   Body requerido: { nombre, apellido, ...opcionales }
 router.post('/', 
   validarCamposRequeridos(['nombre', 'apellido']),
-  pacientesController.crearPaciente
+  controladorPacientes.crearPaciente
 );
 
 // * POST /api/pacientes/minimo
 //   Crea registro mínimo: { nombre, apellido }
 router.post('/minimo', 
   validarCamposRequeridos(['nombre', 'apellido']),
-  pacientesController.crearPacienteMinimo
+  controladorPacientes.crearPacienteMinimo
 );
 
 // * PUT /api/pacientes/:id
 router.put('/:id', 
   validarCamposRequeridos(['nombre', 'apellido']),
-  pacientesController.actualizarPaciente
+  controladorPacientes.actualizarPaciente
 );
 
 // * DELETE /api/pacientes/:id (soft delete)
-router.delete('/:id', pacientesController.eliminarPaciente);
+router.delete('/:id', controladorPacientes.eliminarPaciente);
 
 module.exports = router;

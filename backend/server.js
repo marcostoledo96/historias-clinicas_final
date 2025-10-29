@@ -1,56 +1,98 @@
-// ! Punto de entrada del backend Express
-// ? Este archivo levanta el servidor, configura middlewares, sesiones, rutas y sirve el frontend
-// TODO: Si agregas nuevas rutas, impórtalas y móntalas aquí
+// Servidor principal del backend
+// Acá configuro Express, middlewares, sesiones, rutas y sirvo el frontend estático
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const path = require('path');
 const { exec } = require('child_process');
-// * Cargar variables de entorno desde .env (puerto, credenciales DB, secretos, etc.)
+// Cargo las variables de entorno desde .env
 require('dotenv').config();
 
 const app = express();
-// * Puerto de escucha (por defecto 3000)
+// Puerto donde va a escuchar el servidor (por defecto 3000)
 const PORT = process.env.PORT || 3000;
 
+// Detrás de proxies (Vercel/Heroku/NGINX) necesitamos confiar en el proxy
+// para que express-session pueda marcar la cookie como Secure correctamente
+if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
+// Detrás de proxies (Vercel/Heroku/NGINX) necesitamos confiar en el proxy
+// para que express-session pueda marcar la cookie como Secure correctamente
+if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Middlewares
-// * CORS: permitir cookies/sesiones desde el frontend servido localmente
+// CORS: permitir cookies/sesiones desde el frontend servido localmente
+const allowedOrigins = [
+  'http://localhost:3000', 
+  'http://127.0.0.1:5500',
+  'https://vercel.app',
+  process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
+].filter(Boolean);
+
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:5500'],
+  origin: function (origin, callback) {
+    // Permitir requests sin origin (como mobile apps) o desde dominios permitidos
+    if (!origin || allowedOrigins.some(allowed => origin.includes(allowed.replace('https://', '').replace('http://', '')))) {
+      return callback(null, true);
+    }
+    callback(new Error('No permitido por CORS'));
+  },
   credentials: true
 }));
 
-// * Body parsers para JSON y formularios (x-www-form-urlencoded)
+// Body parsers para JSON y formularios
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Configuración de sesiones
-// * Sesiones en memoria (cambiar a store persistente en producción)
+// Uso sesiones en memoria (en producción sería mejor un store persistente)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'historias_clinicas_secret',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // true en producción con HTTPS
-    maxAge: 24 * 60 * 60 * 1000 // 24 horas
+    secure: process.env.NODE_ENV === 'production', // true en producción con HTTPS
+    maxAge: 24 * 60 * 60 * 1000, // 24 horas
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   }
 }));
 
-// Servir archivos estáticos del frontend
-// * Servir el frontend estático (HTML/CSS/JS) desde la carpeta frontend
+// Sirvo archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// * Importar y montar rutas de la API (MVC)
+// Importo y monto las rutas de la API
 const authRoutes = require('./routes/auth');
 const pacientesRoutes = require('./routes/pacientes');
 const consultasRoutes = require('./routes/consultas');
 const turnosRoutes = require('./routes/turnos');
 
-// Usar las rutas
+// Middleware de logging específico para Vercel
+if (process.env.VERCEL) {
+  app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - Usuario: ${req.session?.usuario?.email || 'anónimo'}`);
+    next();
+  });
+}
+
+// Uso las rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/consultas', consultasRoutes);
 app.use('/api/turnos', turnosRoutes);
+
+// Ruta de salud para diagnóstico
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV,
+    vercel: !!process.env.VERCEL
+  });
+});
 
 // * Ruta raíz: entrega Inicio (la página maneja redirecciones si falta sesión)
 app.get('/', (req, res) => {
@@ -71,15 +113,15 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
 
-// Iniciar el servidor sólo fuera de entorno de test
-// * Iniciar el servidor (evitado en tests)
-if (process.env.NODE_ENV !== 'test') {
+// Iniciar el servidor sólo fuera de entorno de test y Vercel
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   const MAX_REINTENTOS = 5;
 
   const iniciar = (puerto, intentosRestantes) => {
     const server = app.listen(puerto, () => {
       console.log(`🚀 Servidor ejecutándose en http://localhost:${puerto}`);
       console.log(`📁 Sirviendo archivos estáticos desde: ${path.join(__dirname, '../frontend')}`);
+      console.log(`✅ Conectado a PostgreSQL exitosamente`);
 
       // Apertura automática del navegador (opcional)
       // ? AUTO_OPEN=1 abre el navegador automáticamente (útil en desarrollo)

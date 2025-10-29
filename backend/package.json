@@ -1,37 +1,45 @@
 {
   "name": "sistema-historias-clinicas",
   "version": "1.0.0",
-  "description": "Sistema de Historias Clínicas Médicas para doctores",
+  "description": "Sistema de Historias Clínicas Médicas que desarrollé para doctores",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "build": "node migrate.js",
     "migrate": "node migrate.js",
     "seed": "node migrate.js",
     "check:seed": "node scripts/check_seed.js",
     "db:migrate": "node migrate.js",
     "db:check-seed": "node scripts/check_seed.js",
     "admin:create": "node scripts/create_admin.js",
-  "user:create": "node scripts/create_user.js",
+    "user:create": "node scripts/create_user.js",
     "sql": "node run_sql.js",
     "migrate:patients:relax": "node run_sql.js ../database/migrations/20251019_relajar_requeridos_pacientes.sql",
     "test": "jest"
   },
-  "keywords": ["historias-clinicas", "medico", "postgresql", "express"],
+  "keywords": [
+    "historias-clinicas",
+    "medico",
+    "postgresql",
+    "express"
+  ],
   "author": "Marcos Toledo",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2",
-    "pg": "^8.11.3",
     "bcrypt": "^5.1.1",
+    "connect-pg-simple": "^9.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
     "express-session": "^1.17.3",
     "multer": "^1.4.5-lts.1",
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1"
+    "pg": "^8.11.3",
+    "sistema-historias-clinicas": "file:"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1",
     "jest": "^29.7.0",
+    "nodemon": "^3.0.1",
     "supertest": "^6.3.3"
   }
 }

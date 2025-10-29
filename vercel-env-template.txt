@@ -1,0 +1,19 @@
+# Configuración de variables de entorno para Vercel
+# Estas variables deben configurarse en el dashboard de Vercel en:
+# Project Settings > Environment Variables
+
+# Base de datos (usar tu URL de Supabase)
+DATABASE_URL=postgresql://postgres.tuproyecto:tupassword@aws-1-us-east-2.pooler.supabase.com:5432/postgres?sslmode=require
+
+# Sesiones y seguridad
+SESSION_SECRET=historias_clinicas_secret_2024_muy_seguro_123
+
+# Entorno de producción
+NODE_ENV=production
+
+# SSL y configuración de base de datos
+NO_SSL=false
+PGSSLMODE=require
+
+# Vercel específicos
+VERCEL=1

@@ -1,17 +1,17 @@
-// ! Conexión a PostgreSQL
-// ? Este módulo expone un Pool (pg) configurado a partir de .env o DATABASE_URL
+// Conexión a PostgreSQL
+// Este módulo configura el Pool de conexiones usando .env o DATABASE_URL
 const { Pool } = require('pg');
 const dns = require('dns');
 const path = require('path');
-// * Preferir IPv4 primero (mitiga ENOTFOUND/ETIMEDOUT en ciertos proveedores)
+// Prefiero IPv4 primero para evitar problemas de ENOTFOUND/ETIMEDOUT
 try { dns.setDefaultResultOrder && dns.setDefaultResultOrder('ipv4first'); } catch {}
-// * Cargar .env desde backend explícitamente (evita depender del CWD)
+// Cargo .env desde backend específicamente para evitar problemas de directorio
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
-// * Permitir configurar la conexión vía DATABASE_URL o por campos separados
+// Permito configurar la conexión usando DATABASE_URL o campos separados
 const hasConnectionString = !!process.env.DATABASE_URL;
 
-// * Parseo robusto de DATABASE_URL → objeto de config legible por pg
+// Función para parsear DATABASE_URL y convertirla a objeto que entienda pg
 function parseDatabaseUrl(dbUrl) {
   try {
     const u = new URL(dbUrl);
@@ -28,7 +28,7 @@ function parseDatabaseUrl(dbUrl) {
   }
 }
 
-// * Config base final según haya o no DATABASE_URL
+// Configuración base dependiendo de si hay DATABASE_URL o no
 const baseConfig = hasConnectionString
   ? parseDatabaseUrl(process.env.DATABASE_URL)
   : {
@@ -39,8 +39,8 @@ const baseConfig = hasConnectionString
       port: Number(process.env.DB_PORT || 5432),
     };
 
-// * SSL robusto por defecto (entornos gestionados como Supabase/Heroku)
-//   Se puede desactivar con NO_SSL=true o PGSSLMODE=disable; no-verify evita problemas con certificados
+// Configuración SSL robusta por defecto (para servicios como Supabase/Heroku)
+// Se puede desactivar con NO_SSL=true o PGSSLMODE=disable
 const sslMode = String(process.env.PGSSLMODE || '').toLowerCase();
 const noSSL = String(process.env.NO_SSL || '').toLowerCase() === 'true' || sslMode === 'disable';
 const noVerify = sslMode === 'no-verify' || sslMode === 'prefer';
