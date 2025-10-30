@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "Frontend static + Express API on Vercel",
-  "engines": { "node": "18.x" },
+  "engines": { "node": "22.x" },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "connect-pg-simple": "^9.0.0",
@@ -15,4 +15,3 @@
     "pg": "^8.11.3"
   }
 }
-
