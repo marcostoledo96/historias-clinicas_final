@@ -37,6 +37,16 @@ app.use(cors({
   credentials: true,
 }));
 
+// Responder preflight (OPTIONS) para permitir POST con credenciales desde el navegador
+app.options('*', cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    const ok = allowedOrigins.some((allowed) => origin.includes(allowed.replace('https://', '').replace('http://', '')));
+    return ok ? callback(null, true) : callback(new Error('No permitido por CORS'));
+  },
+  credentials: true,
+}));
+
 // Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -123,4 +133,3 @@ if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
 }
 
 module.exports = app;
-
