@@ -8,185 +8,27 @@ let turnosHoy = [];
 document.addEventListener('DOMContentLoaded', async () => {
     const acceso = await inicializarPagina();
     if (!acceso) return;
-    
-    // Cargar datos de inicio
-    await Promise.all([
-        cargarEstadisticas(),
-        cargarTurnosHoy()
-    ]);
-    
-    // Configurar event listeners
+    // MVP: se eliminaron estadísticas y turnos de hoy
     configurarEventListeners();
 });
 
 // * cargarEstadisticas(): solicita totales y calcula métricas del mes actual
-async function cargarEstadisticas() {
-    try {
-        // Cargar total de pacientes
-        const pacientesResponse = await fetch('/api/pacientes', {
-            credentials: 'include'
-        });
-        
-        if (pacientesResponse.ok) {
-            const pacientes = await pacientesResponse.json();
-            document.getElementById('total-pacientes').textContent = pacientes.length;
-        }
-        
-        // Cargar turnos de hoy
-        const turnosResponse = await fetch('/api/turnos/hoy', {
-            credentials: 'include'
-        });
-        
-        if (turnosResponse.ok) {
-            const turnos = await turnosResponse.json();
-            document.getElementById('turnos-hoy').textContent = turnos.length;
-            
-            // Contar atendidos hoy
-            const atendidos = turnos.filter(turno => turno.situacion === 'atendido').length;
-            document.getElementById('pacientes-atendidos').textContent = atendidos;
-        }
-        
-        // Cargar consultas del mes actual
-        const fechaInicio = new Date();
-        fechaInicio.setDate(1);
-        const consultasResponse = await fetch('/api/consultas', {
-            credentials: 'include'
-        });
-        
-        if (consultasResponse.ok) {
-            const consultas = await consultasResponse.json();
-            const consultasMes = consultas.filter(consulta => {
-                const fechaConsulta = new Date(consulta.fecha);
-                return fechaConsulta.getMonth() === new Date().getMonth() &&
-                       fechaConsulta.getFullYear() === new Date().getFullYear();
-            });
-            document.getElementById('consultas-mes').textContent = consultasMes.length;
-        }
-        
-    } catch (error) {
-        console.error('Error cargando estadísticas:', error);
-        manejarErrorAPI(error);
-    }
-}
+// cargarEstadisticas eliminado (MVP)
 
 // * cargarTurnosHoy(): obtiene turnos del día y los muestra en la tabla
-async function cargarTurnosHoy() {
-    try {
-        const response = await fetch('/api/turnos/hoy', {
-            credentials: 'include'
-        });
-        
-        if (response.ok) {
-            turnosHoy = await response.json();
-            mostrarTurnos(turnosHoy);
-        } else {
-            manejarErrorAPI(null, response);
-        }
-        
-    } catch (error) {
-        console.error('Error cargando turnos:', error);
-        manejarErrorAPI(error);
-    } finally {
-        ocultarElemento('loading-turnos');
-        mostrarElemento('turnos-container');
-    }
-}
+// cargarTurnosHoy eliminado (MVP)
 
 // * mostrarTurnos(turnos): pinta filas del listado de turnos del día
-function mostrarTurnos(turnos) {
-    const tbody = document.getElementById('turnos-tbody');
-    const sinTurnos = document.getElementById('sin-turnos');
-    
-    if (turnos.length === 0) {
-        tbody.innerHTML = '';
-        mostrarElemento('sin-turnos');
-        return;
-    }
-    
-    ocultarElemento('sin-turnos');
-    
-    tbody.innerHTML = turnos.map(turno => `
-        <tr>
-            <td><strong>${turno.horario.substring(0, 5)}</strong></td>
-            <td>${turno.nombre} ${turno.apellido}</td>
-            <td>${turno.dni}</td>
-            <td>${turno.cobertura || 'Sin cobertura'}</td>
-            <td>${getBadgeSituacion(turno.situacion)}</td>
-            <td>${turno.primera_vez ? '✅ Sí' : '-'}</td>
-            <td>
-                <div class="flex gap-2">
-                    <button onclick="verPaciente(${turno.id_paciente})" class="btn btn-sm btn-primary">
-                        <span class="material-symbols-outlined" aria-hidden="true">visibility</span> Ver
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
-}
+// mostrarTurnos eliminado (MVP)
 
 // * marcarLlegada(idTurno): setea situacion=en_espera con hora actual
-async function marcarLlegada(idTurno) {
-    try {
-        const response = await fetch(`/api/turnos/${idTurno}/situacion`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                situacion: 'en_espera',
-                hora_llegada: new Date().toTimeString().substring(0, 8)
-            })
-        });
-        
-        if (response.ok) {
-            mostrarAlerta('Paciente marcado como llegado', 'success');
-            await cargarTurnosHoy();
-            await cargarEstadisticas();
-        } else {
-            const error = await response.json();
-            mostrarAlerta(error.error || 'Error al marcar llegada', 'error');
-        }
-        
-    } catch (error) {
-        console.error('Error marcando llegada:', error);
-        manejarErrorAPI(error);
-    }
-}
+// marcarLlegada eliminado (MVP)
 
 // * marcarAtendido(idTurno)
-async function marcarAtendido(idTurno) {
-    try {
-        const response = await fetch(`/api/turnos/${idTurno}/situacion`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                situacion: 'atendido'
-            })
-        });
-        
-        if (response.ok) {
-            mostrarAlerta('Paciente marcado como atendido', 'success');
-            await cargarTurnosHoy();
-            await cargarEstadisticas();
-        } else {
-            const error = await response.json();
-            mostrarAlerta(error.error || 'Error al marcar como atendido', 'error');
-        }
-        
-    } catch (error) {
-        console.error('Error marcando como atendido:', error);
-        manejarErrorAPI(error);
-    }
-}
+// marcarAtendido eliminado (MVP)
 
 // * verPaciente(idPaciente): abre perfil en nueva pestaña
-function verPaciente(idPaciente) {
-    abrirPerfilPaciente(idPaciente);
-}
+// verPaciente eliminado (MVP)
 
 // * configurarEventListeners(): wire del modal de búsqueda rápida y sus eventos
 function configurarEventListeners() {

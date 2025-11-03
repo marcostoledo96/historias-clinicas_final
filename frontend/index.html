@@ -5,12 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Sistema de Historias Clínicas</title>
     <link rel="stylesheet" href="css/styles.css">
-        <script>
-            // Aplicar tema guardado lo antes posible para evitar parpadeos
-            (function(){
-                try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch(e) {}
-            })();
-        </script>
         <!--
             ! Página: Login
             * Propósito: iniciar sesión en el sistema; si ya hay sesión activa, redirige a inicio
@@ -20,9 +14,7 @@
     
 </head>
 <body>
-        <button id="theme-toggle-standalone" class="theme-standalone-btn" aria-label="Alternar tema" title="Alternar tema">
-            <span class="material-symbols-outlined" aria-hidden="true">dark_mode</span>
-        </button>
+        <!-- Toggle de tema removido (MVP: solo tema claro) -->
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
@@ -84,12 +76,9 @@
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
     <script>
-        // Verificar si ya está autenticado
+        // Ya no redirige automáticamente si hay sesión activa (evita "auto login")
         document.addEventListener('DOMContentLoaded', async () => {
-            const authStatus = await verificarAutenticacion();
-            if (authStatus.autenticado) {
-                    window.location.href = 'inicio.html';
-            }
+            // Opcional: podríamos mostrar un aviso si ya hay sesión y ofrecer botones
         });
 
         // Manejo del formulario de login
@@ -127,7 +116,7 @@
                 if (response.ok) {
                     mostrarAlerta('Login exitoso. Redirigiendo...', 'success');
                     setTimeout(() => {
-                        window.location.href = 'inicio.html';
+                        window.location.href = 'pacientes.html';
                     }, 1000);
                 } else {
                     mostrarAlerta(result.error || 'Error al iniciar sesión', 'error');
@@ -144,27 +133,7 @@
             }
         });
 
-                // Toggle de tema standalone
-                (function(){
-                    const btn = document.getElementById('theme-toggle-standalone');
-                    if (!btn) return;
-                    const icon = btn.querySelector('.material-symbols-outlined');
-                    const getTheme = () => document.documentElement.getAttribute('data-theme') || 'light';
-                    const setIcon = () => {
-                        const t = getTheme();
-                        icon.textContent = t === 'dark' ? 'light_mode' : 'dark_mode';
-                        btn.setAttribute('aria-label', `Alternar a tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
-                        btn.setAttribute('title', `Tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
-                    };
-                    setIcon();
-                    btn.addEventListener('click', () => {
-                        const current = getTheme();
-                        const next = current === 'dark' ? 'light' : 'dark';
-                        document.documentElement.setAttribute('data-theme', next);
-                        try { localStorage.setItem('theme', next); } catch(e) {}
-                        setIcon();
-                    });
-                })();
+                // Toggle de tema removido (MVP)
     </script>
 </body>
 </html>

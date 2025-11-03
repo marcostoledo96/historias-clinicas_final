@@ -94,20 +94,7 @@ function configurarHeaderInteractivo() {
     });
   }
 
-  // Toggle tema
-  const btnTheme = document.getElementById('btn-toggle-theme');
-  if (btnTheme) {
-    btnTheme.addEventListener('click', () => {
-      const actual = document.documentElement.getAttribute('data-theme') === 'dark' ? 'oscuro' : 'claro';
-      const nuevo = actual === 'oscuro' ? 'claro' : 'oscuro';
-      document.documentElement.setAttribute('data-theme', nuevo === 'oscuro' ? 'dark' : 'light');
-      try {
-        const prefs = JSON.parse(localStorage.getItem('preferencias') || '{}');
-        prefs.tema = nuevo;
-        localStorage.setItem('preferencias', JSON.stringify(prefs));
-      } catch {}
-    });
-  }
+  // Toggle tema eliminado (MVP: solo tema claro)
 
   // Toggle menú navegación (responsive)
   const btnNav = document.getElementById('btn-nav-toggle');

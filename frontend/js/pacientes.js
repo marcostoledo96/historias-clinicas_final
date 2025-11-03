@@ -58,51 +58,12 @@ function configurarEventosPacientes() {
   }, 300));
 
   document.getElementById('btn-nuevo').addEventListener('click', () => {
-    document.getElementById('card-nuevo').classList.remove('hidden');
-    document.getElementById('panel-listado').scrollIntoView({ behavior: 'smooth' });
+    // Abrir alta en nueva pestaña con la misma distribución que perfil_paciente
+    const base = window.location.origin + window.location.pathname.replace(/[^/]*$/, '');
+    const url = new URL(base + 'paciente_crear.html');
+    window.open(url.toString(), '_blank');
   });
-
-  document.getElementById('btn-cancelar-nuevo').addEventListener('click', () => {
-    document.getElementById('card-nuevo').classList.add('hidden');
-    limpiarFormulario('form-nuevo-paciente');
-  });
-
-  document.getElementById('form-nuevo-paciente').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.target).entries());
-    
-    // Validaciones mínimas
-    if (!validarDNI(data.dni)) {
-      mostrarAlerta('DNI inválido', 'error');
-      return;
-    }
-    if (data.email && !validarEmail(data.email)) {
-      mostrarAlerta('Email inválido', 'error');
-      return;
-    }
-
-    try {
-      const resp = await fetch('/api/pacientes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(data)
-      });
-      const result = await resp.json();
-      if (resp.ok) {
-        mostrarAlerta('Paciente creado con éxito', 'success');
-        document.getElementById('card-nuevo').classList.add('hidden');
-        limpiarFormulario('form-nuevo-paciente');
-        await cargarPacientes();
-        if (result.id_paciente) cargarDetallePaciente(result.id_paciente);
-      } else {
-        manejarErrorAPI(result, resp);
-        mostrarAlerta(result.error || 'No se pudo crear el paciente', 'error');
-      }
-    } catch (e) {
-      manejarErrorAPI(e);
-    }
-  });
+  // Se elimina el alta inline en pacientes (MVP). La creación se realiza en paciente_crear.html.
 }
 
 // * renderPaginaPacientes(): pagina en cliente y genera filas de tabla

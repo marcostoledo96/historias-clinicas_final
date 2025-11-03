@@ -70,21 +70,5 @@ function configurarFormularios() {
     finally { setButtonLoading('btn-guardar-password', false); }
   });
 
-  const formPref = document.getElementById('form-preferencias');
-  formPref.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(formPref).entries());
-    data.auto_inicio = formPref.auto_inicio.checked;
-    // Guardar en localStorage (preferencias locales por ahora)
-    localStorage.setItem('preferencias', JSON.stringify(data));
-    mostrarAlerta('Preferencias guardadas localmente', 'success');
-  });
-
-  // Cargar preferencias previas si existen
-  try {
-    const prefs = JSON.parse(localStorage.getItem('preferencias') || '{}');
-    if (prefs.tema) document.querySelector('#form-preferencias [name="tema"]').value = prefs.tema;
-    if (typeof prefs.auto_inicio === 'boolean') document.querySelector('#form-preferencias [name="auto_inicio"]').checked = prefs.auto_inicio;
-    if (prefs.page_size) document.querySelector('#form-preferencias [name="page_size"]').value = String(prefs.page_size);
-  } catch {}
+  // Sección de preferencias eliminada (MVP)
 }

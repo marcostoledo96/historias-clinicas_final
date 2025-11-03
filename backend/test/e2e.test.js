@@ -19,7 +19,7 @@ describe('E2E - API principal', () => {
 
   let idPaciente;
   let idConsulta;
-  let idTurno;
+  // Turnos eliminados del MVP: no se prueban endpoints de /api/turnos
 
   beforeAll(async () => {
     jest.setTimeout(30000);
@@ -83,32 +83,7 @@ describe('E2E - API principal', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Crear turno', async () => {
-    const res = await agent
-      .post('/api/turnos')
-      .send({
-        id_paciente: idPaciente,
-        dia: hoyFecha(),
-        horario: horaValida(),
-        cobertura: 'Particular',
-        detalle: 'Turno E2E',
-      });
-    expect(res.status).toBe(201);
-    expect(res.body.id_turno).toBeDefined();
-    idTurno = res.body.id_turno;
-  });
-
-  test('Cambiar situación de turno', async () => {
-    const res = await agent
-      .put(`/api/turnos/${idTurno}/situacion`)
-      .send({ situacion: 'en_espera', hora_llegada: '10:05:00' });
-    expect(res.status).toBe(200);
-  });
-
-  test('Eliminar turno', async () => {
-    const res = await agent.delete(`/api/turnos/${idTurno}`);
-    expect(res.status).toBe(200);
-  });
+  // Tests de Turnos eliminados
 
   test('Eliminar consulta', async () => {
     const res = await agent.delete(`/api/consultas/${idConsulta}`);

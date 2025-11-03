@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const { id, edit } = getURLParams();
   if (!id) {
     mostrarAlerta('Falta ID de paciente', 'error');
-    setTimeout(() => (window.location.href = 'inicio.html'), 1500);
+  setTimeout(() => (window.location.href = 'pacientes.html'), 1500);
     return;
   }
 
@@ -118,7 +118,7 @@ function configurarEventosPerfil(id) {
   });
 
   document.getElementById('btn-cancelar-perfil').addEventListener('click', () => {
-    window.history.length > 1 ? window.history.back() : window.location.href = 'inicio.html';
+    window.history.length > 1 ? window.history.back() : window.location.href = 'pacientes.html';
   });
 
   const abrir = document.getElementById('btn-abrir-nueva-consulta');

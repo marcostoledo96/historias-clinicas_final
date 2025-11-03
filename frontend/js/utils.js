@@ -233,13 +233,7 @@ function abrirPerfilPaciente(id, editar = false) {
 // Aplicar tema según preferencias locales (claro/oscuro)
 // * Aplicación de tema claro/oscuro
 // > Lee localStorage.preferencias.tema y setea data-theme en <html>.
+// Tema: forzar tema claro por simplicidad en el MVP
 (function aplicarTemaPreferencias() {
-  try {
-    const prefs = JSON.parse(localStorage.getItem('preferencias') || '{}');
-    const tema = prefs.tema || 'claro';
-    document.documentElement.setAttribute('data-theme', tema === 'oscuro' ? 'dark' : 'light');
-  } catch (e) {
-    // por defecto claro
-    document.documentElement.setAttribute('data-theme', 'light');
-  }
+  document.documentElement.setAttribute('data-theme', 'light');
 })();

@@ -10,16 +10,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Crear Usuario</title>
   <link rel="stylesheet" href="css/styles.css" />
-  <script>
-    (function(){
-      try { var t = localStorage.getItem('theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch(e) {}
-    })();
-  </script>
+  <!-- Tema persistente removido (MVP) -->
 </head>
 <body>
-  <button id="theme-toggle-standalone" class="theme-standalone-btn" aria-label="Alternar tema" title="Alternar tema">
-    <span class="material-symbols-outlined" aria-hidden="true">dark_mode</span>
-  </button>
+  <!-- Toggle de tema removido -->
   <div class="login-container">
     <div class="login-card">
       <div class="login-header"><h1>Crear Usuario</h1><p>Solo administradores</p></div>
@@ -37,27 +31,6 @@
   <script src="js/utils.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/registro.js"></script>
-  <script>
-    (function(){
-      const btn = document.getElementById('theme-toggle-standalone');
-      if (!btn) return;
-      const icon = btn.querySelector('.material-symbols-outlined');
-      const getTheme = () => document.documentElement.getAttribute('data-theme') || 'light';
-      const setIcon = () => {
-        const t = getTheme();
-        icon.textContent = t === 'dark' ? 'light_mode' : 'dark_mode';
-        btn.setAttribute('aria-label', `Alternar a tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
-        btn.setAttribute('title', `Tema ${t === 'dark' ? 'claro' : 'oscuro'}`);
-      };
-      setIcon();
-      btn.addEventListener('click', () => {
-        const current = getTheme();
-        const next = current === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', next);
-        try { localStorage.setItem('theme', next); } catch(e) {}
-        setIcon();
-      });
-    })();
-  </script>
+  <!-- Script de toggle de tema removido -->
 </body>
 </html>

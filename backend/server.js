@@ -21,31 +21,32 @@ if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
 }
 
 // CORS con credenciales (cookies)
+// Política: en desarrollo permitir localhost/127.0.0.1 en cualquier puerto; en producción, whitelist explícito
+const isDev = process.env.NODE_ENV !== 'production';
 const allowedOrigins = [
-  'http://localhost:3000',
-  'http://127.0.0.1:5500',
   'https://vercel.app',
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null
 ].filter(Boolean);
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    const ok = allowedOrigins.some((allowed) => origin.includes(allowed.replace('https://', '').replace('http://', '')));
+const corsOrigin = (origin, callback) => {
+  if (!origin) return callback(null, true); // requests same-origin o sin header Origin
+  try {
+    if (isDev) {
+      // Permitir cualquier localhost/127.0.0.1 (cualquier puerto)
+      const okLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
+      if (okLocal) return callback(null, true);
+    }
+    // Producción: validar contra whitelist
+    const ok = allowedOrigins.some((allowed) => origin === allowed || origin.endsWith(`.${allowed.replace(/^https?:\/\//, '')}`));
     return ok ? callback(null, true) : callback(new Error('No permitido por CORS'));
-  },
-  credentials: true,
-}));
+  } catch (e) {
+    return callback(new Error('No permitido por CORS'));
+  }
+};
 
-// Responder preflight (OPTIONS) para permitir POST con credenciales desde el navegador
-app.options('*', cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    const ok = allowedOrigins.some((allowed) => origin.includes(allowed.replace('https://', '').replace('http://', '')));
-    return ok ? callback(null, true) : callback(new Error('No permitido por CORS'));
-  },
-  credentials: true,
-}));
+app.use(cors({ origin: corsOrigin, credentials: true }));
+// Responder preflight (OPTIONS)
+app.options('*', cors({ origin: corsOrigin, credentials: true }));
 
 // Body parsers
 app.use(express.json());
@@ -75,7 +76,6 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 const authRoutes = require('./routes/auth');
 const pacientesRoutes = require('./routes/pacientes');
 const consultasRoutes = require('./routes/consultas');
-const turnosRoutes = require('./routes/turnos');
 
 if (process.env.VERCEL) {
   app.use((req, res, next) => {
@@ -87,16 +87,16 @@ if (process.env.VERCEL) {
 app.use('/api/auth', authRoutes);
 app.use('/api/pacientes', pacientesRoutes);
 app.use('/api/consultas', consultasRoutes);
-app.use('/api/turnos', turnosRoutes);
+// Endpoints de Turnos deshabilitados para MVP (frontend ya no los usa)
 
 // Salud
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString(), env: process.env.NODE_ENV, vercel: !!process.env.VERCEL });
 });
 
-// Raíz: inicio
+// Raíz: login (ya no hay inicio.html)
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/inicio.html'));
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
 // Errores

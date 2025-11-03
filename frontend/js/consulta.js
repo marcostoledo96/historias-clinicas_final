@@ -89,7 +89,7 @@ async function cargarConsulta(id) {
 function configurarEventosConsulta(opts = {}) {
   const { modo, idConsulta, idPaciente } = opts;
   document.getElementById('btn-volver-consulta').addEventListener('click', () => {
-    window.history.length > 1 ? window.history.back() : window.location.href = 'inicio.html';
+    window.history.length > 1 ? window.history.back() : window.location.href = 'pacientes.html';
   });
 
   const btnPerfil = document.getElementById('btn-ver-perfil-consulta');

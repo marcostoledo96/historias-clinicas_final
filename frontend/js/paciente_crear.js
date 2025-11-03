@@ -78,8 +78,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   inicializarAutoGrowTextareasCrear();
 
   document.getElementById('btn-cancelar-crear').addEventListener('click', () => {
-    if (returnTo === 'turnos') window.location.href = 'turnos.html';
-    else window.history.length > 1 ? window.history.back() : window.location.href = 'inicio.html';
+  // Redirección simplificada: sin Inicio, volver o ir a Pacientes
+  window.history.length > 1 ? window.history.back() : window.location.href = 'pacientes.html';
   });
 
   document.getElementById('form-crear-paciente').addEventListener('submit', async (e) => {
@@ -95,8 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (resp.ok) {
         mostrarAlerta('Paciente creado', 'success');
         setTimeout(() => {
-          if (returnTo === 'turnos') window.location.href = 'turnos.html';
-          else window.location.href = `perfil_paciente.html?id=${result.id_paciente}`;
+          window.location.href = `perfil_paciente.html?id=${result.id_paciente}`;
         }, 500);
       } else {
         manejarErrorAPI(result, resp);
